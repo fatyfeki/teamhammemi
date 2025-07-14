@@ -505,46 +505,7 @@
             transform: translateX(0);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .categories-container {
-                margin-left: 0;
-                padding: 20px 15px;
-                margin-top: 60px;
-            }
-            
-            .categories-header {
-                flex-direction: column;
-                gap: 20px;
-                align-items: stretch;
-            }
-            
-            .header-actions {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .search-input {
-                width: 100%;
-            }
-            
-            .search-input:focus {
-                width: 100%;
-            }
-            
-            .categories-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .categories-stats {
-                flex-direction: column;
-            }
-            
-            .modal-content {
-                padding: 25px;
-                margin: 20px;
-            }
-             /* Ajout pour le modal de confirmation de suppression */
+        /* Confirmation Modal */
         .confirm-modal {
             display: none;
             position: fixed;
@@ -601,6 +562,46 @@
         .confirm-cancel:hover {
             background: #5a6268;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .categories-container {
+                margin-left: 0;
+                padding: 20px 15px;
+                margin-top: 60px;
+            }
+            
+            .categories-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .search-input:focus {
+                width: 100%;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-stats {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                padding: 25px;
+                margin: 20px;
+            }
         }
     </style>
 </head>
@@ -711,7 +712,7 @@ try {
                             <i class="fas <?php echo htmlspecialchars($category['icon'] ?? 'fa-tag'); ?>"></i>
                         </div>
                         <div class="category-actions">
-                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editCategory(<?php echo $category['id_categorie']; ?>)">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); showEditModal(<?php echo $category['id_categorie']; ?>)">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="action-btn delete-btn" onclick="event.stopPropagation(); showConfirmModal(<?php echo $category['id_categorie']; ?>, '<?php echo addslashes($category['nom_categorie']); ?>', <?php echo $category['product_count']; ?>)">
@@ -733,7 +734,7 @@ try {
         </div>
     </main>
 
-    <!-- Modal to add/edit category -->
+    <!-- Modal to add category -->
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <button class="close-modal" onclick="hideAddCategoryModal()">
@@ -783,6 +784,56 @@ try {
         </div>
     </div>
 
+    <!-- Modal to edit category -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="hideEditModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title">
+                <i class="fas fa-edit"></i>
+                Edit Category
+            </h2>
+            <form id="editCategoryForm">
+                <input type="hidden" id="editCategoryId">
+                <div class="form-group">
+                    <label for="editCategoryName">Category Name *</label>
+                    <input type="text" id="editCategoryName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategoryDescription">Description</label>
+                    <textarea id="editCategoryDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editCategoryIcon">Icon</label>
+                    <select id="editCategoryIcon" class="form-control" onchange="updateEditIconPreview()">
+                        <option value="fa-file-alt">📄 Stationery</option>
+                        <option value="fa-laptop">💻 IT Equipment</option>
+                        <option value="fa-chair">🪑 Furniture</option>
+                        <option value="fa-print">🖨️ Printing</option>
+                        <option value="fa-broom">🧹 Cleaning</option>
+                        <option value="fa-pen">✏️ Pen</option>
+                        <option value="fa-ruler">📏 Ruler</option>
+                        <option value="fa-coffee">☕ Coffee</option>
+                        <option value="fa-phone">📞 Phone</option>
+                        <option value="fa-book">📚 Books</option>
+                        <option value="fa-tools">🔧 Tools</option>
+                        <option value="fa-lightbulb">💡 Lighting</option>
+                    </select>
+                    <div class="icon-preview">
+                        <div class="icon-preview-box">
+                            <i class="fas fa-file-alt" id="editIconPreview"></i>
+                        </div>
+                        <span>Icon Preview</span>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Update Category
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Show add category modal
         function showAddCategoryModal() {
@@ -796,28 +847,38 @@ try {
             }, 10);
         }
 
-        // View products by category
-        function viewProductsByCategory(categoryId) {
-            window.location.href = `productlist.php?category_id=${categoryId}`;
-        }
-
-        // Edit category
-        function editCategory(categoryId) {
+        // Show edit category modal
+        function showEditModal(categoryId) {
             const categoryCard = document.querySelector(`[data-category="${categoryId}"]`);
             
             if (categoryCard) {
-                document.getElementById('modalTitle').textContent = 'Edit Category';
-                document.getElementById('categoryId').value = categoryId;
-                document.getElementById('categoryName').value = categoryCard.querySelector('h3').textContent;
-                document.getElementById('categoryDescription').value = categoryCard.querySelector('p').textContent;
+                document.getElementById('editCategoryId').value = categoryId;
+                document.getElementById('editCategoryName').value = categoryCard.querySelector('h3').textContent;
+                document.getElementById('editCategoryDescription').value = categoryCard.querySelector('p').textContent;
                 
                 const icon = categoryCard.querySelector('.category-icon i').className;
                 const iconValue = icon.replace('fas ', '');
-                document.getElementById('categoryIcon').value = iconValue;
-                updateIconPreview();
+                document.getElementById('editCategoryIcon').value = iconValue;
+                updateEditIconPreview();
                 
-                showAddCategoryModal();
+                document.getElementById('editModal').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('editModal').classList.add('active');
+                }, 10);
             }
+        }
+
+        // Hide edit modal
+        function hideEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('editModal').style.display = 'none';
+            }, 300);
+        }
+
+        // View products by category
+        function viewProductsByCategory(categoryId) {
+            window.location.href = `productlist.php?category_id=${categoryId}`;
         }
 
         // Show confirmation modal
@@ -895,6 +956,12 @@ try {
             document.getElementById('iconPreview').className = `fas ${selectedIcon}`;
         }
 
+        // Update edit icon preview
+        function updateEditIconPreview() {
+            const selectedIcon = document.getElementById('editCategoryIcon').value;
+            document.getElementById('editIconPreview').className = `fas ${selectedIcon}`;
+        }
+
         // Show success message
         function showSuccessMessage(message) {
             const successMsg = document.getElementById('successMessage');
@@ -930,7 +997,7 @@ try {
             });
         }
 
-        // Form handling
+        // Form handling for add category
         document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -976,10 +1043,54 @@ try {
             });
         });
 
+        // Form handling for edit category
+        document.getElementById('editCategoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editCategoryId').value;
+            const name = document.getElementById('editCategoryName').value.trim();
+            const description = document.getElementById('editCategoryDescription').value.trim();
+            const icon = document.getElementById('editCategoryIcon').value;
+            
+            if (!name) {
+                alert('Category name is required!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('name', name);
+            formData.append('description', description);
+            formData.append('icon', icon);
+            
+            fetch('update_category.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    showSuccessMessage(data.message);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating category');
+            });
+        });
+
         // Close modal when clicking outside
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('categoryModal')) {
                 hideAddCategoryModal();
+            }
+            if (e.target === document.getElementById('editModal')) {
+                hideEditModal();
             }
             if (e.target === document.getElementById('confirmModal')) {
                 hideConfirmModal();
