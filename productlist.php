@@ -907,15 +907,165 @@ try {
         }
 
         function exportProducts() {
-            // Get current filters from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const categoryId = urlParams.get('category_id') || '';
-            const sortBy = urlParams.get('sort') || 'newest';
-            const searchQuery = urlParams.get('search') || '';
-            
-            // Redirect to export script with filters
-            window.location.href = `exportproducts.php?category_id=${categoryId}&sort=${sortBy}&search=${encodeURIComponent(searchQuery)}`;
-        }
+    // Get current date and time
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    const timeStr = now.toLocaleTimeString();
+    
+    // Create HTML content with beautiful styling
+    const productsTable = document.querySelector('.product-table').outerHTML;
+    const style = `
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                color: #333;
+                line-height: 1.6;
+                padding: 20px;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #8b0000;
+                padding-bottom: 20px;
+            }
+            .title {
+                color: #8b0000;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .subtitle {
+                color: #666;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            .meta {
+                font-size: 12px;
+                color: #888;
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 25px 0;
+                font-size: 14px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+            thead tr {
+                background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+                color: #ffffff;
+                text-align: left;
+                font-weight: bold;
+            }
+            th, td {
+                padding: 12px 15px;
+                border: 1px solid #e0e0e0;
+            }
+            tbody tr {
+                border-bottom: 1px solid #e0e0e0;
+            }
+            tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            tbody tr:last-of-type {
+                border-bottom: 2px solid #8b0000;
+            }
+            tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+            .product-info {
+                display: flex;
+                align-items: center;
+            }
+            .product-image {
+                width: 50px;
+                height: 50px;
+                border-radius: 8px;
+                object-fit: cover;
+                margin-right: 15px;
+                border: 1px solid #e0e0e0;
+            }
+            .product-details {
+                display: flex;
+                flex-direction: column;
+            }
+            .product-name {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .product-description {
+                font-size: 12px;
+                color: #666;
+            }
+            .price-high {
+                color: #c62828;
+                font-weight: bold;
+            }
+            .price-medium {
+                color: #f57c00;
+                font-weight: bold;
+            }
+            .price-low {
+                color: #2e7d32;
+                font-weight: bold;
+            }
+            .category-badge {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: bold;
+                color: white;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                background: #607d8b;
+            }
+            .footer {
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #888;
+            }
+        </style>
+    `;
+    
+    const htmlContent = `
+        <html>
+            <head>
+                <title>Products List Export - CH OfficeTrack</title>
+                ${style}
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">CH OfficeTrack - Products Inventory</div>
+                    <div class="subtitle">Product Management System</div>
+                    <div class="meta">Generated on ${dateStr} at ${timeStr}</div>
+                </div>
+                
+                ${productsTable}
+                
+                <div class="footer">
+                    <p>© ${now.getFullYear()} CH OfficeTrack - Confidential</p>
+                </div>
+            </body>
+        </html>
+    `;
+    
+    // Open a new window with the content
+    const printWindow = window.open('', '_blank');
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    };
+}
     </script>
 </body>
 </html>
