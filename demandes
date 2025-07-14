@@ -1,0 +1,11 @@
+CREATE TABLE demandes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_name VARCHAR(100) NOT NULL,
+  category VARCHAR(100) NOT NULL,
+  quantity INT NOT NULL,
+  urgent VARCHAR(10) NOT NULL,
+  reason TEXT,
+  comment TEXT,
+  file_name VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
