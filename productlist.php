@@ -912,8 +912,20 @@ try {
     const dateStr = now.toLocaleDateString();
     const timeStr = now.toLocaleTimeString();
     
+    // Clone the table to avoid modifying the original
+    const tableClone = document.querySelector('.product-table').cloneNode(true);
+    
+    // Remove the Actions column (last column)
+    const rows = tableClone.querySelectorAll('tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('th, td');
+        if (cells.length > 0) { // Make sure row has cells
+            // Remove last cell (Actions column)
+            row.removeChild(cells[cells.length - 1]);
+        }
+    });
+    
     // Create HTML content with beautiful styling
-    const productsTable = document.querySelector('.product-table').outerHTML;
     const style = `
         <style>
             body {
@@ -1044,7 +1056,7 @@ try {
                     <div class="meta">Generated on ${dateStr} at ${timeStr}</div>
                 </div>
                 
-                ${productsTable}
+                ${tableClone.outerHTML}
                 
                 <div class="footer">
                     <p>© ${now.getFullYear()} CH OfficeTrack - Confidential</p>
