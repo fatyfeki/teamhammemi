@@ -647,6 +647,103 @@
                 transparent 100%
             );
         }
+        /* Confirmation Dialog Styles */
+.confirmation-dialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog-content {
+    background: white;
+    border-radius: 16px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: dialogFadeIn 0.3s ease;
+}
+
+@keyframes dialogFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dialog-header {
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.dialog-body {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.dialog-icon {
+    font-size: 48px;
+    color: #8b0000;
+    margin-bottom: 20px;
+}
+
+.dialog-message {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.dialog-footer {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.dialog-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    min-width: 100px;
+}
+
+.dialog-btn-cancel {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.dialog-btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.dialog-btn-confirm {
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
+}
+
+.dialog-btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
+}
     </style>
 </head>
 <?php 
@@ -1078,6 +1175,71 @@ try {
         }, 500);
     };
 }
+let productToDelete = null;
+
+function showDeleteDialog(id) {
+    productToDelete = id;
+    document.getElementById('deleteDialog').style.display = 'flex';
+}
+
+function hideDeleteDialog() {
+    document.getElementById('deleteDialog').style.display = 'none';
+    productToDelete = null;
+}
+
+function confirmDelete() {
+    if (productToDelete) {
+        fetch('deleteproduct.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: productToDelete })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Show success message (you can add a toast notification here)
+                alert('Product deleted successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting product');
+        })
+        .finally(() => {
+            hideDeleteDialog();
+        });
+    }
+}
+
+// Replace the existing deleteProduct function with this:
+function deleteProduct(id) {
+    showDeleteDialog(id);
+}
     </script>
+    <!-- Confirmation Dialog -->
+<div class="confirmation-dialog" id="deleteDialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>Confirm Deletion</h3>
+        </div>
+        <div class="dialog-body">
+            <div class="dialog-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="dialog-message">
+                Are you sure you want to delete this product? This action cannot be undone.
+            </div>
+        </div>
+        <div class="dialog-footer">
+            <button class="dialog-btn dialog-btn-cancel" onclick="hideDeleteDialog()">Cancel</button>
+            <button class="dialog-btn dialog-btn-confirm" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
