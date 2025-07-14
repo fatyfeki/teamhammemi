@@ -544,6 +544,63 @@
                 padding: 25px;
                 margin: 20px;
             }
+             /* Ajout pour le modal de confirmation de suppression */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirm-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .confirm-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .confirm-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .confirm-delete:hover {
+            background: #c82333;
+        }
+        
+        .confirm-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .confirm-cancel:hover {
+            background: #5a6268;
+        }
         }
     </style>
 </head>
@@ -583,6 +640,18 @@ try {
     <!-- Success Message -->
     <div class="success-message" id="successMessage">
         <i class="fas fa-check-circle"></i> Category added successfully!
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-content">
+            <h3><i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 24px;"></i> Confirm Deletion</h3>
+            <p id="confirmMessage">Are you sure you want to delete this category? Products in this category will not be deleted but will be moved to "Uncategorized".</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-cancel" onclick="hideConfirmModal()">Cancel</button>
+                <button class="confirm-btn confirm-delete" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
     </div>
 
     <!-- Main Content -->
@@ -636,29 +705,30 @@ try {
         <!-- Categories Grid -->
         <div class="categories-grid" id="categoriesGrid">
             <?php foreach($categories as $category): ?>
-                <div class="category-card" data-category="<?php echo $category['id_categorie']; ?>" onclick="viewProductsByCategory(<?php echo $category['id_categorie']; ?>)">                <div class="category-header">
-                    <div class="category-icon">
-                        <i class="fas <?php echo htmlspecialchars($category['icon'] ?? 'fa-tag'); ?>"></i>
+                <div class="category-card" data-category="<?php echo $category['id_categorie']; ?>" onclick="viewProductsByCategory(<?php echo $category['id_categorie']; ?>)">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas <?php echo htmlspecialchars($category['icon'] ?? 'fa-tag'); ?>"></i>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editCategory(<?php echo $category['id_categorie']; ?>)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); showConfirmModal(<?php echo $category['id_categorie']; ?>, '<?php echo addslashes($category['nom_categorie']); ?>', <?php echo $category['product_count']; ?>)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="category-actions">
-                        <button class="action-btn edit-btn" onclick="editCategory(<?php echo $category['id_categorie']; ?>)">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete-btn" onclick="deleteCategory(<?php echo $category['id_categorie']; ?>)">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <h3><?php echo htmlspecialchars($category['nom_categorie']); ?></h3>
+                    <p><?php echo htmlspecialchars($category['description'] ?? 'No description'); ?></p>
+                    <div class="category-meta">
+                        <span class="product-count"><?php echo $category['product_count']; ?> products</span>
+                        <span class="category-tag">
+                            <i class="fas fa-clock"></i> 
+                            <?php echo isset($category['date_creation']) ? 'Created ' . date('M d, Y', strtotime($category['date_creation'])) : 'No date'; ?>
+                        </span>
                     </div>
                 </div>
-                <h3><?php echo htmlspecialchars($category['nom_categorie']); ?></h3>
-                <p><?php echo htmlspecialchars($category['description'] ?? 'No description'); ?></p>
-                <div class="category-meta">
-                    <span class="product-count"><?php echo $category['product_count']; ?> products</span>
-                    <span class="category-tag">
-                        <i class="fas fa-clock"></i> 
-                        <?php echo isset($category['date_creation']) ? 'Created ' . date('M d, Y', strtotime($category['date_creation'])) : 'No date'; ?>
-                    </span>
-                </div>
-            </div>
             <?php endforeach; ?>
         </div>
     </main>
@@ -725,6 +795,8 @@ try {
                 document.getElementById('categoryModal').classList.add('active');
             }, 10);
         }
+
+        // View products by category
         function viewProductsByCategory(categoryId) {
             window.location.href = `productlist.php?category_id=${categoryId}`;
         }
@@ -748,35 +820,65 @@ try {
             }
         }
 
+        // Show confirmation modal
+        function showConfirmModal(categoryId, categoryName, productCount) {
+            const confirmModal = document.getElementById('confirmModal');
+            const confirmMessage = document.getElementById('confirmMessage');
+            
+            if (productCount > 0) {
+                confirmMessage.innerHTML = `
+                    <p>You are about to delete the category <strong>"${categoryName}"</strong> which contains <strong>${productCount} products</strong>.</p>
+                    <p>These products will be moved to "Uncategorized". Are you sure you want to proceed?</p>
+                `;
+            } else {
+                confirmMessage.innerHTML = `
+                    <p>Are you sure you want to delete the category <strong>"${categoryName}"</strong>?</p>
+                `;
+            }
+            
+            // Set up delete button
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            confirmDeleteBtn.onclick = function() {
+                deleteCategory(categoryId);
+            };
+            
+            confirmModal.style.display = 'flex';
+        }
+
+        // Hide confirmation modal
+        function hideConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
         // Delete category
         function deleteCategory(categoryId) {
-            if (confirm('Are you sure you want to delete this category? Products in this category will not be deleted.')) {
-                fetch('delete_category.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `id=${categoryId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success) {
-                        document.querySelector(`[data-category="${categoryId}"]`).remove();
-                        showSuccessMessage(data.message);
-                        // Update stats
-                        document.getElementById('totalCategories').textContent = 
-                            parseInt(document.getElementById('totalCategories').textContent) - 1;
-                        document.getElementById('activeCategories').textContent = 
-                            parseInt(document.getElementById('activeCategories').textContent) - 1;
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error deleting category');
-                });
-            }
+            hideConfirmModal();
+            
+            fetch('delete_category.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id=${categoryId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    document.querySelector(`[data-category="${categoryId}"]`).remove();
+                    showSuccessMessage(data.message);
+                    // Update stats
+                    document.getElementById('totalCategories').textContent = 
+                        parseInt(document.getElementById('totalCategories').textContent) - 1;
+                    document.getElementById('activeCategories').textContent = 
+                        parseInt(document.getElementById('activeCategories').textContent) - 1;
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting category');
+            });
         }
 
         // Hide modal
@@ -826,7 +928,6 @@ try {
                     });
                 }, 300);
             });
-            
         }
 
         // Form handling
@@ -875,22 +976,13 @@ try {
             });
         });
 
-        function filterProducts() {
-    const categoryId = parseInt(document.getElementById('categoryFilter').value);
-    const sortBy = document.getElementById('sortFilter').value;
-    const searchQuery = document.getElementById('searchFilter').value.toLowerCase();
-    
-    // Redirect with category filter
-    if (categoryId > 0) {
-        window.location.href = `productlist.php?category_id=${categoryId}`;
-    } else {
-        window.location.href = `productlist.php`;
-    }
-}
         // Close modal when clicking outside
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('categoryModal')) {
                 hideAddCategoryModal();
+            }
+            if (e.target === document.getElementById('confirmModal')) {
+                hideConfirmModal();
             }
         });
 
