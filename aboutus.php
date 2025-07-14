@@ -1,4 +1,4 @@
-abs<?php
+<?php
 // about-us.php
 require_once('header.php');
 ?>
