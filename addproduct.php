@@ -569,7 +569,16 @@
     </style>
 </head>
 <body>
-<?php include 'sys.php'; ?>
+    <?php 
+    // Include database connection
+    include 'db.php';
+    include 'article.php';
+    
+    // Include sidebar (if sys.php contains sidebar)
+    if (file_exists('sys.php')) {
+        include 'sys.php'; 
+    }
+    ?>
    
     <!-- Top Navigation -->
     <nav class="top-navbar">
@@ -624,75 +633,59 @@
                         <span class="form-help">Manufacturer or brand</span>
                     </div>
                     
+                    <!-- Category -->
                     <div class="form-group">
-    <label class="form-label">Category <span class="required">*</span></label>
-    <select name="id_categorie" class="form-select" required>
-        <option value="">Select a category</option>
-        <?php
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "ch office track";
-        
-        try {
-            $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categories ORDER BY nom_categorie");
-            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            foreach($categories as $category) {
-                echo '<option value="'.$category['id_categorie'].'">'.htmlspecialchars($category['nom_categorie']).'</option>';
-            }
-        } catch(PDOException $e) {
-            echo '<option value="">Error loading categories</option>';
-        }
-        ?>
-    </select>
-    <span class="form-help">Product category</span>
-</div>
-
+                        <label class="form-label">Category <span class="required">*</span></label>
+                        <select name="id_categorie" class="form-select" required>
+                            <option value="">Select a category</option>
+                            <?php
+                            try {
+                                $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categories ORDER BY nom_categorie");
+                                $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                foreach($categories as $category) {
+                                    echo '<option value="'.$category['id_categorie'].'">'.htmlspecialchars($category['nom_categorie']).'</option>';
+                                }
+                            } catch(PDOException $e) {
+                                echo '<option value="">Error loading categories</option>';
+                            }
+                            ?>
+                        </select>
+                        <span class="form-help">Product category</span>
+                    </div>
                     
                     <!-- Import Date -->
                     <div class="form-group">
-    <label class="form-label">Import Date <span class="required">*</span></label>
-    <input type="datetime-local" name="date_importation" class="form-input" required>
-    <span class="form-help">Product import date</span>
-</div>
+                        <label class="form-label">Import Date <span class="required">*</span></label>
+                        <input type="datetime-local" name="date_importation" class="form-input" required>
+                        <span class="form-help">Product import date</span>
+                    </div>
+                    
+                    <!-- Supplier -->
                     <div class="form-group">
-    <label class="form-label">Supplier <span class="required">*</span></label>
-    <input type="text" name="fournisseur" class="form-input" required>
-    <span class="form-help">Product supplier</span>
-</div>
-<div class="form-group">
-    <label class="form-label">Supplier Information</label>
-    <input type="text" name="info_fournisseur" class="form-input">
-    <span class="form-help">Additional supplier details</span>
-</div>
-<div class="form-group">
-    <label class="form-label">Location <span class="required">*</span></label>
-    <input type="text" name="location" class="form-input" required>
-    <span class="form-help">Where the product is stored</span>
-</div>
-<div class="form-group">
-    <label class="form-label">Unit <span class="required">*</span></label>
-    <select name="unit" class="form-select" required>
-        <option value="piece">Piece</option>
-        <option value="box">Box</option>
-        <option value="pack">Pack</option>
-        <option value="set">Set</option>
-        <option value="kg">Kilogram</option>
-        <option value="liter">Liter</option>
-    </select>
-    <span class="form-help">Unit of measurement</span>
-</div>
+                        <label class="form-label">Supplier <span class="required">*</span></label>
+                        <input type="text" name="fournisseur" class="form-input" placeholder="Supplier name" required>
+                        <span class="form-help">Product supplier</span>
+                    </div>
+                    
+                    <!-- Unit -->
+                    <div class="form-group">
+                        <label class="form-label">Unit <span class="required">*</span></label>
+                        <select name="unit" class="form-select" required>
+                            <option value="">Select unit</option>
+                            <option value="piece">Piece</option>
+                            <option value="set">Set</option>
+                            <option value="pack">Pack</option>
+                        </select>
+                        <span class="form-help">Unit of measurement</span>
+                    </div>
+                    
                     <!-- Minimum Threshold -->
                     <div class="form-group">
                         <label class="form-label">Minimum Threshold <span class="required">*</span></label>
                         <input type="number" name="seuil_min" class="form-input" placeholder="0" min="0" required>
                         <span class="form-help">Alert threshold</span>
                     </div>
-                    
                     
                     <!-- Purchase Price -->
                     <div class="form-group">
@@ -770,7 +763,7 @@
                 String(now.getHours()).padStart(2, '0') + ':' + 
                 String(now.getMinutes()).padStart(2, '0');
             
-            document.querySelector('input[name="date_dimportation"]').value = formattedDate;
+            document.querySelector('input[name="date_importation"]').value = formattedDate;
             
             // Calculer le total initial
             calculateTotal();
@@ -827,7 +820,7 @@
                 String(now.getHours()).padStart(2, '0') + ':' + 
                 String(now.getMinutes()).padStart(2, '0');
             
-            document.querySelector('input[name="date_dimportation"]').value = formattedDate;
+            document.querySelector('input[name="date_importation"]').value = formattedDate;
         }
     </script>
 </body>
