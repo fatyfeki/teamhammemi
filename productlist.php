@@ -171,70 +171,6 @@
             z-index: 2;
         }
 
-        /* Animations */
-        .nav-item {
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideIn 0.5s ease forwards;
-        }
-
-        .nav-item:nth-child(1) { animation-delay: 0.1s; }
-        .nav-item:nth-child(2) { animation-delay: 0.2s; }
-        .nav-item:nth-child(3) { animation-delay: 0.3s; }
-        .nav-item:nth-child(4) { animation-delay: 0.4s; }
-        .nav-item:nth-child(5) { animation-delay: 0.5s; }
-        .nav-item:nth-child(6) { animation-delay: 0.6s; }
-        .nav-item:nth-child(7) { animation-delay: 0.7s; }
-        .nav-item:nth-child(8) { animation-delay: 0.8s; }
-        .nav-item:nth-child(9) { animation-delay: 0.9s; }
-        .nav-item:nth-child(10) { animation-delay: 1.0s; }
-
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Effet de brillance */
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255,255,255,0.2),
-                transparent
-            );
-            transition: left 0.5s;
-        }
-
-        .nav-link.active:hover::after {
-            left: 100%;
-        }
-
-        /* Scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
-        }
-
         /* Top Navigation Bar */
         .top-navbar {
             position: fixed;
@@ -294,94 +230,6 @@
             transform: translateY(-50%);
             color: #6c757d;
             font-size: 14px;
-        }
-
-        /* Notifications */
-        .notifications {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .notifications .fas {
-            font-size: 20px;
-            color: #6c757d;
-            transition: color 0.2s ease;
-        }
-
-        .notifications:hover .fas {
-            color: #8b0000;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #8b0000;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        /* Profile Menu */
-        .profile-menu {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 12px;
-            transition: background 0.2s ease;
-        }
-
-        .profile-menu:hover {
-            background: #f8f9fa;
-        }
-
-        .profile-avatar {
-            position: relative;
-        }
-
-        .profile-avatar img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #e9ecef;
-        }
-
-        .status-indicator {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background: #28a745;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .profile-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .profile-role {
-            color: #6c757d;
-            font-size: 12px;
         }
 
         /* Main Content Area */
@@ -468,15 +316,9 @@
         /* Product Table */
         .product-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 10px;
             margin-top: 20px;
-        }
-
-        .product-table th,
-        .product-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
         }
 
         .product-table th {
@@ -486,29 +328,111 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            padding: 12px 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .product-table td {
+            padding: 15px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-left: none;
+            border-right: none;
+        }
+
+        .product-table tr {
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
 
         .product-table tr:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .product-table tr:first-child td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .product-table tr:first-child td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .product-image-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
             background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
         .product-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid #e9ecef;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product-details {
+            flex: 1;
         }
 
         .product-name {
             font-weight: 600;
             color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .product-description {
             color: #6c757d;
             font-size: 13px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stock-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stock-quantity {
+            font-weight: 600;
+        }
+
+        .low-stock {
+            color: #dc3545;
+        }
+
+        .normal-stock {
+            color: #28a745;
+        }
+
+        .stock-alert {
+            font-size: 10px;
+            color: #dc3545;
+            margin-top: 3px;
+        }
+
+        .category-badge {
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #333;
         }
 
         .action-buttons {
@@ -517,12 +441,30 @@
         }
 
         .btn-action {
-            padding: 6px 12px;
+            padding: 8px;
             border-radius: 6px;
             font-size: 12px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .btn-action i {
+            font-size: 14px;
+        }
+
+        .btn-view {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #218838;
         }
 
         .btn-edit {
@@ -541,15 +483,6 @@
 
         .btn-delete:hover {
             background: #c82333;
-        }
-
-        .btn-view {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-view:hover {
-            background: #218838;
         }
 
         /* Filters */
@@ -629,23 +562,11 @@
             .filter-select {
                 width: 100%;
             }
-        }
 
-        /* Subtle glow effect */
-        .sidebar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 1px;
-            height: 100%;
-            background: linear-gradient(
-                180deg,
-                transparent 0%,
-                rgba(139,0,0,0.3) 20%,
-                rgba(139,0,0,0.1) 80%,
-                transparent 100%
-            );
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -654,13 +575,16 @@
     include 'db.php';
     include 'sys.php';
 
+    // Configuration du chemin des images
+    $uploadDir = 'uploads/';
+    
     try {
         // Get filters from URL
         $categoryFilter = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
         $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
         $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 
-        // Base SQL query with correct column names
+        // Base SQL query
         $sql = "SELECT 
                     a.id_article, a.nom, a.description, a.marque, c.nom_categorie as categorie, 
                     a.date_importation, a.fournisseur, a.unit, 
@@ -786,8 +710,8 @@
                     <table class="product-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Product</th>
+                                <th>Description</th>
                                 <th>Category</th>
                                 <th>Brand</th>
                                 <th>Supplier</th>
@@ -801,33 +725,61 @@
                         <tbody>
                             <?php foreach($products as $product): ?>
                                 <tr data-category-id="<?php echo $product['id_categorie'] ?? ''; ?>">
-                                    <td><?php echo htmlspecialchars($product['id_article']); ?></td>
                                     <td>
-                                        <div class="product-name">
-                                            <?php if($product['image']): ?>
-                                                <img src="<?php echo htmlspecialchars($product['image']); ?>" class="product-image" alt="<?php echo htmlspecialchars($product['nom']); ?>">
-                                            <?php endif; ?>
-                                            <?php echo htmlspecialchars($product['nom']); ?>
+                                        <div class="product-info">
+                                            <div class="product-image-container">
+                                                <?php if(!empty($product['image'])): ?>
+                                                    <?php 
+                                                    $imagePath = $uploadDir . basename($product['image']);
+                                                    if(file_exists($imagePath)): ?>
+                                                        <img src="<?php echo $imagePath; ?>" 
+                                                             class="product-image" 
+                                                             alt="<?php echo htmlspecialchars($product['nom']); ?>">
+                                                    <?php else: ?>
+                                                        <i class="fas fa-box-open" style="color: #6c757d;"></i>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <i class="fas fa-box-open" style="color: #6c757d;"></i>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="product-name"><?php echo htmlspecialchars($product['nom']); ?></div>
                                         </div>
-                                        <div class="product-description"><?php echo htmlspecialchars(substr($product['description'], 0, 50)); ?>...</div>
                                     </td>
-                                    <td><?php echo htmlspecialchars($product['categorie'] ?? 'N/A'); ?></td>
+                                    <td>
+                                        <div class="product-description">
+                                            <?php echo htmlspecialchars($product['description']); ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="category-badge">
+                                            <?php echo htmlspecialchars($product['categorie'] ?? 'N/A'); ?>
+                                        </span>
+                                    </td>
                                     <td><?php echo htmlspecialchars($product['marque'] ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($product['fournisseur'] ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($product['unit'] ?? 'N/A'); ?></td>
-                                    <td><?php echo htmlspecialchars($product['stock_actuel'] ?? 0); ?></td>
+                                    <td>
+                                        <div class="stock-info">
+                                            <span class="stock-quantity <?php echo ($product['stock_actuel'] <= $product['seuil_min']) ? 'low-stock' : 'normal-stock'; ?>">
+                                                <?php echo htmlspecialchars($product['stock_actuel'] ?? 0); ?>
+                                            </span>
+                                            <?php if($product['stock_actuel'] <= $product['seuil_min']): ?>
+                                                <span class="stock-alert">Low stock</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
                                     <td><?php echo number_format($product['prix_achat'] ?? 0, 2) . ' TND'; ?></td>
                                     <td><?php echo number_format($product['totale_achat'] ?? 0, 2) . ' TND'; ?></td>
                                     <td>
                                         <div class="action-buttons">
                                             <button class="btn-action btn-view" onclick="viewProduct(<?php echo $product['id_article']; ?>)">
-                                                <i class="fas fa-eye"></i> View
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                             <button class="btn-action btn-edit" onclick="editProduct(<?php echo $product['id_article']; ?>)">
-                                                <i class="fas fa-edit"></i> Edit
+                                                <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn-action btn-delete" onclick="deleteProduct(<?php echo $product['id_article']; ?>)">
-                                                <i class="fas fa-trash"></i> Delete
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -906,178 +858,178 @@
             }
         }
 
-       function exportProducts() {
-    // Get current date and time
-    const now = new Date();
-    const dateStr = now.toLocaleDateString();
-    const timeStr = now.toLocaleTimeString();
-    
-    // Clone the table to avoid modifying the original
-    const tableClone = document.querySelector('.product-table').cloneNode(true);
-    
-    // Remove the Actions column (last column)
-    const rows = tableClone.querySelectorAll('tr');
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('th, td');
-        if (cells.length > 0) { // Make sure row has cells
-            // Remove last cell (Actions column)
-            row.removeChild(cells[cells.length - 1]);
+        function exportProducts() {
+            // Get current date and time
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            // Clone the table to avoid modifying the original
+            const tableClone = document.querySelector('.product-table').cloneNode(true);
+            
+            // Remove the Actions column (last column)
+            const rows = tableClone.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                if (cells.length > 0) {
+                    // Remove last cell (Actions column)
+                    row.removeChild(cells[cells.length - 1]);
+                }
+            });
+            
+            // Create HTML content with beautiful styling
+            const style = `
+                <style>
+                    body {
+                        font-family: 'Arial', sans-serif;
+                        color: #333;
+                        line-height: 1.6;
+                        padding: 20px;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #8b0000;
+                        padding-bottom: 20px;
+                    }
+                    .title {
+                        color: #8b0000;
+                        font-size: 24px;
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    .subtitle {
+                        color: #666;
+                        font-size: 14px;
+                        margin-bottom: 10px;
+                    }
+                    .meta {
+                        font-size: 12px;
+                        color: #888;
+                        margin-bottom: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 25px 0;
+                        font-size: 14px;
+                        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                    }
+                    thead tr {
+                        background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+                        color: #ffffff;
+                        text-align: left;
+                        font-weight: bold;
+                    }
+                    th, td {
+                        padding: 12px 15px;
+                        border: 1px solid #e0e0e0;
+                    }
+                    tbody tr {
+                        border-bottom: 1px solid #e0e0e0;
+                    }
+                    tbody tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                    tbody tr:last-of-type {
+                        border-bottom: 2px solid #8b0000;
+                    }
+                    tbody tr:hover {
+                        background-color: #f1f1f1;
+                    }
+                    .product-info {
+                        display: flex;
+                        align-items: center;
+                    }
+                    .product-image {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 8px;
+                        object-fit: cover;
+                        margin-right: 15px;
+                        border: 1px solid #e0e0e0;
+                    }
+                    .product-details {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .product-name {
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    .product-description {
+                        font-size: 12px;
+                        color: #666;
+                    }
+                    .price-high {
+                        color: #c62828;
+                        font-weight: bold;
+                    }
+                    .price-medium {
+                        color: #f57c00;
+                        font-weight: bold;
+                    }
+                    .price-low {
+                        color: #2e7d32;
+                        font-weight: bold;
+                    }
+                    .category-badge {
+                        display: inline-block;
+                        padding: 5px 10px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: white;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        background: #607d8b;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #e0e0e0;
+                        font-size: 12px;
+                        color: #888;
+                    }
+                </style>
+            `;
+            
+            const htmlContent = `
+                <html>
+                    <head>
+                        <title>Products List Export - CH OfficeTrack</title>
+                        ${style}
+                    </head>
+                    <body>
+                        <div class="header">
+                            <div class="title">CH OfficeTrack - Products Inventory</div>
+                            <div class="subtitle">Product Management System</div>
+                            <div class="meta">Generated on ${dateStr} at ${timeStr}</div>
+                        </div>
+                        
+                        ${tableClone.outerHTML}
+                        
+                        <div class="footer">
+                            <p>© ${now.getFullYear()} CH OfficeTrack - Confidential</p>
+                        </div>
+                    </body>
+                </html>
+            `;
+            
+            // Open a new window with the content
+            const printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
         }
-    });
-    
-    // Create HTML content with beautiful styling
-    const style = `
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                color: #333;
-                line-height: 1.6;
-                padding: 20px;
-            }
-            .header {
-                text-align: center;
-                margin-bottom: 30px;
-                border-bottom: 2px solid #8b0000;
-                padding-bottom: 20px;
-            }
-            .title {
-                color: #8b0000;
-                font-size: 24px;
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            .subtitle {
-                color: #666;
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-            .meta {
-                font-size: 12px;
-                color: #888;
-                margin-bottom: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 25px 0;
-                font-size: 14px;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            }
-            thead tr {
-                background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
-                color: #ffffff;
-                text-align: left;
-                font-weight: bold;
-            }
-            th, td {
-                padding: 12px 15px;
-                border: 1px solid #e0e0e0;
-            }
-            tbody tr {
-                border-bottom: 1px solid #e0e0e0;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            tbody tr:last-of-type {
-                border-bottom: 2px solid #8b0000;
-            }
-            tbody tr:hover {
-                background-color: #f1f1f1;
-            }
-            .product-info {
-                display: flex;
-                align-items: center;
-            }
-            .product-image {
-                width: 50px;
-                height: 50px;
-                border-radius: 8px;
-                object-fit: cover;
-                margin-right: 15px;
-                border: 1px solid #e0e0e0;
-            }
-            .product-details {
-                display: flex;
-                flex-direction: column;
-            }
-            .product-name {
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            .product-description {
-                font-size: 12px;
-                color: #666;
-            }
-            .price-high {
-                color: #c62828;
-                font-weight: bold;
-            }
-            .price-medium {
-                color: #f57c00;
-                font-weight: bold;
-            }
-            .price-low {
-                color: #2e7d32;
-                font-weight: bold;
-            }
-            .category-badge {
-                display: inline-block;
-                padding: 5px 10px;
-                border-radius: 4px;
-                font-size: 12px;
-                font-weight: bold;
-                color: white;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                background: #607d8b;
-            }
-            .footer {
-                text-align: center;
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #e0e0e0;
-                font-size: 12px;
-                color: #888;
-            }
-        </style>
-    `;
-    
-    const htmlContent = `
-        <html>
-            <head>
-                <title>Products List Export - CH OfficeTrack</title>
-                ${style}
-            </head>
-            <body>
-                <div class="header">
-                    <div class="title">CH OfficeTrack - Products Inventory</div>
-                    <div class="subtitle">Product Management System</div>
-                    <div class="meta">Generated on ${dateStr} at ${timeStr}</div>
-                </div>
-                
-                ${tableClone.outerHTML}
-                
-                <div class="footer">
-                    <p>© ${now.getFullYear()} CH OfficeTrack - Confidential</p>
-                </div>
-            </body>
-        </html>
-    `;
-    
-    // Open a new window with the content
-    const printWindow = window.open('', '_blank');
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    
-    // Wait for content to load then print
-    printWindow.onload = function() {
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
-    };
-}
     </script>
 </body>
 </html>
