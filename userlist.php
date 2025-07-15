@@ -49,6 +49,8 @@ function normalizeRole($fonction) {
     return $role_data;
 }
 ?>
+
+<!-- [Le reste du fichier HTML/CSS/JS reste inchangé] -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -993,7 +995,7 @@ if (isset($_SESSION['error_message'])) {
         // Fonction pour exporter les utilisateurs
         function exportUsers() {
             Swal.fire({
-                title: 'Exporter les utilisateurs',
+                title: 'Exporter les utilisateur',
                 html: 'Choisissez le format d\'exportation',
                 showDenyButton: true,
                 showCancelButton: true,
