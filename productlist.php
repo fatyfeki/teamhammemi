@@ -778,9 +778,14 @@
                                             <button class="btn-action btn-edit" onclick="editProduct(<?php echo $product['id_article']; ?>)">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn-action btn-delete" onclick="deleteProduct(<?php echo $product['id_article']; ?>)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                           <button class="btn-action btn-delete" 
+        onclick="deleteProduct(
+            <?php echo $product['id_article']; ?>,
+            '<?php echo addslashes($product['nom']); ?>',
+            '<?php echo addslashes($product['description']); ?>'
+        )">
+    <i class="fas fa-trash"></i> 
+</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -875,6 +880,75 @@
                     // Remove last cell (Actions column)
                     row.removeChild(cells[cells.length - 1]);
                 }
+                function deleteProduct(id, name, description, productCount = 0) {
+    // Construire le message en fonction du nombre de produits
+    let message = `You are about to delete the product <strong>"${name}"</strong>.`;
+    
+    if (productCount > 0) {
+        message = `You are about to delete the category <strong>"${name}"</strong> which contains <strong>${productCount} products</strong>.<br><br>`;
+        message += `These products will be moved to "Uncategorized".`;
+    }
+    
+    // Ajouter la description si elle existe
+    if (description) {
+        message += `<br><br><em>${description}</em>`;
+    }
+
+    Swal.fire({
+        title: 'Confirm Deletion',
+        html: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        focusCancel: true,
+        customClass: {
+            popup: 'custom-swal-popup',
+            title: 'custom-swal-title',
+            htmlContainer: 'custom-swal-html',
+            confirmButton: 'custom-swal-confirm',
+            cancelButton: 'custom-swal-cancel'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('deleteproduct.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire(
+                        'Deleted!',
+                        'The item has been deleted.',
+                        'success'
+                    ).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        data.message || 'Failed to delete item.',
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    'An error occurred while deleting the item.',
+                    'error'
+                );
+            });
+        }
+    });
+}
             });
             
             // Create HTML content with beautiful styling
@@ -992,6 +1066,7 @@
                         font-size: 12px;
                         color: #888;
                     }
+                    
                 </style>
             `;
             
@@ -1031,5 +1106,200 @@
             };
         }
     </script>
+    // Ajoutez ceci dans le <head> de votre HTML
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.swal2-popup {
+    font-family: 'Inter', sans-serif;
+    border-radius: 12px !important;
+    padding: 25px !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal2-title {
+    color: #8b0000 !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 15px !important;
+}
+
+.swal2-html-container {
+    text-align: left !important;
+    color: #555 !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    margin: 15px 0 !important;
+}
+
+.swal2-html-container strong {
+    color: #333 !important;
+    font-weight: 600 !important;
+}
+
+.description-box {
+    display: block !important;
+    padding: 12px !important;
+    background: #f9f9f9 !important;
+    border-radius: 8px !important;
+    border-left: 3px solid #8b0000 !important;
+    margin: 15px 0 !important;
+    font-style: normal !important;
+    color: #555 !important;
+    font-size: 14px !important;
+}
+
+.swal2-actions {
+    margin-top: 20px !important;
+    gap: 10px !important;
+    justify-content: flex-end !important;
+}
+
+.swal2-confirm {
+    background-color: #8b0000 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-confirm:hover {
+    background-color: #6b0000 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 10px rgba(139, 0, 0, 0.2) !important;
+}
+
+.swal2-cancel {
+    background-color: #f0f0f0 !important;
+    color: #555 !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-cancel:hover {
+    background-color: #e0e0e0 !important;
+    transform: translateY(-1px) !important;
+}
+
+.separator {
+    height: 1px !important;
+    background: #f0f0f0 !important;
+    margin: 15px 0 !important;
+}
+
+.footer-note {
+    font-size: 13px !important;
+    color: #777 !important;
+    text-align: left !important;
+    margin-top: 15px !important;
+    padding-top: 15px !important;
+    border-top: 1px solid #f0f0f0 !important;
+}
+</style>
+
+<script>
+function confirmDelete(id, type, name, description = '', productCount = 0) {
+    let htmlContent = `
+        You are about to delete the ${type} <strong>"${name}"</strong>`;
+    
+    if (type === 'category') {
+        htmlContent += ` which contains <strong>${productCount} products</strong>.<br><br>
+        These products will be moved to "Uncategorized".`;
+    }
+    
+    if (description) {
+        htmlContent += `<div class="description-box">${description}</div>`;
+    }
+    
+    if (type === 'product') {
+        htmlContent += `<div class="footer-note">This action cannot be undone.</div>`;
+    }
+
+    Swal.fire({
+        title: 'Confirm Deletion',
+        html: htmlContent,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Delete ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+        cancelButtonText: 'Cancel',
+        focusCancel: true,
+        customClass: {
+            container: 'swal2-container',
+            popup: 'swal2-popup',
+            title: 'swal2-title',
+            htmlContainer: 'swal2-html-container',
+            confirmButton: 'swal2-confirm',
+            cancelButton: 'swal2-cancel',
+            actions: 'swal2-actions'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('deleteproduct.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    id: id,
+                    type: type
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: `The ${type} has been deleted successfully.`,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || `Failed to delete ${type}.`,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: `An error occurred while deleting the ${type}.`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    });
+}
+
+// Fonctions spécifiques pour un meilleur appel
+function deleteProduct(id, name, description) {
+    confirmDelete(id, 'product', name, description);
+}
+
+function deleteCategory(id, name, productCount) {
+    confirmDelete(id, 'category', name, '', productCount);
+}
+</script>
 </body>
 </html>
