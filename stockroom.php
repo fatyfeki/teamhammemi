@@ -653,606 +653,595 @@ try {
 include "sys.php";
 ?>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="page-header-content">
-                <div>
-                    <h1 class="page-title">Stock Management</h1>
-                    <p class="page-subtitle">Monitor and manage your stock levels</p>
-                </div>
-                <a href="addproduct.php" class="add-product-btn">
-                    <i class="fas fa-plus"></i>
-                    Add Product
-                </a>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">Stock Management</h1>
+                <p class="page-subtitle">Monitor and manage your stock levels</p>
             </div>
+            <a href="addproduct.php" class="add-product-btn">
+                <i class="fas fa-plus"></i>
+                Add Product
+            </a>
         </div>
+    </div>
 
-        <!-- Alerts Section -->
-        <div class="alerts-section" id="alertsSection">
-            <?php
-            // Calculer les alertes de stock
-            $alertProducts = array_filter($products, function($product) {
-                return $product['current_stock'] <= $product['seuil_min'];
-            });
-            
-            if (count($alertProducts) > 0): ?>
-            <div class="alert-card">
-                <div class="alert-header">
-                    <i class="alert-icon fas fa-exclamation-triangle"></i>
-                    <h3 class="alert-title">Stock Alerts</h3>
-                    <span class="alert-count"><?php echo count($alertProducts); ?></span>
-                </div>
-                <div class="alert-products">
-                    <?php foreach(array_slice($alertProducts, 0, 3) as $product): ?>
-                    <div class="alert-product">
-                        <div class="alert-product-name"><?php echo htmlspecialchars($product['nom']); ?></div>
-                        <div class="alert-product-stock">
-                            Stock: <?php echo $product['current_stock'] == 0 ? 'Out' : $product['current_stock'] . ' ' . $product['unit']; ?>
-                        </div>
-                    </div>
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filters-header">
+            <h3 class="filters-title">Advanced Filters</h3>
+        </div>
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <select class="filter-input" id="categoryFilter" onchange="applyFilters()">
+                    <option value="">All Categories</option>
+                    <?php
+                    // Récupérer toutes les catégories uniques
+                    $categories = array_unique(array_column($products, 'categorie_nom'));
+                    foreach ($categories as $category): ?>
+                        <option value="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category); ?></option>
                     <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Filters Section -->
-        <div class="filters-section">
-            <div class="filters-header">
-                <h3 class="filters-title">Advanced Filters</h3>
-            </div>
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Category</label>
-                    <select class="filter-input" id="categoryFilter" onchange="applyFilters()">
-                        <option value="">All Categories</option>
-                        <?php
-                        // Récupérer toutes les catégories uniques
-                        $categories = array_unique(array_column($products, 'categorie_nom'));
-                        foreach ($categories as $category): ?>
-                            <option value="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Stock Status</label>
-                    <select class="filter-input" id="stockFilter" onchange="applyFilters()">
-                        <option value="">All Levels</option>
-                        <option value="out">Out of Stock</option>
-                        <option value="low">Low Stock</option>
-                        <option value="medium">Medium Stock</option>
-                        <option value="high">High Stock</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Supplier</label>
-                    <select class="filter-input" id="supplierFilter" onchange="applyFilters()">
-                        <option value="">All Suppliers</option>
-                        <?php
-                        // Récupérer tous les fournisseurs uniques
-                        $suppliers = array_unique(array_column($products, 'fournisseur'));
-                        foreach ($suppliers as $supplier): ?>
-                            <option value="<?php echo htmlspecialchars($supplier); ?>"><?php echo htmlspecialchars($supplier); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Product Search</label>
-                    <input type="text" class="filter-input" id="productSearch" placeholder="Enter product name..." onkeyup="applyFilters()">
-                </div>
-                
-                <div class="filter-group">
-                    <button class="btn-primary" style="padding: 15px; width: 100%;" onclick="applyFilters()">
-                        Apply Filters
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Products Table Section -->
-        <div class="products-section">
-            <div class="section-header">
-                <h3 class="section-title">Stock Overview</h3>
+                </select>
             </div>
             
-            <div class="table-container">
-                <table class="products-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>Unit Price</th>
-                            <th>Current Stock</th>
-                            <th>Min. Stock</th>
-                            <th>Unit</th>
-                            <th>Location</th>
-                            <th>Supplier</th>
-                            <th>Total Value</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productsTableBody">
-                        <?php foreach ($products as $product): ?>
-                        <?php 
-                            $stockClass = '';
-                            if ($product['current_stock'] == 0) {
-                                $stockClass = 'stock-out';
-                            } elseif ($product['current_stock'] < $product['seuil_min']) {
-                                $stockClass = 'stock-low';
-                            } else {
-                                $stockClass = 'stock-normal';
-                            }
-                            
-                            $statusBadge = '';
-                            if ($product['current_stock'] == 0) {
-                                $statusBadge = 'stock-out';
-                            } elseif ($product['current_stock'] < $product['seuil_min']) {
-                                $statusBadge = 'stock-low';
-                            } elseif ($product['current_stock'] >= $product['seuil_min'] * 2) {
-                                $statusBadge = 'stock-high';
-                            } else {
-                                $statusBadge = 'stock-medium';
-                            }
-                        ?>
-                        <tr class="<?php echo $stockClass; ?>" data-id="<?php echo $product['id_article']; ?>">
-                            <td><?php echo $product['id_article']; ?></td>
-                            <td><?php echo htmlspecialchars($product['nom']); ?></td>
-                            <td><?php echo htmlspecialchars($product['categorie_nom']); ?></td>
-                            <td><?php echo number_format($product['prix_achat'], 2); ?> TND</td>
-                            <td><?php echo $product['current_stock']; ?></td>
-                            <td><?php echo $product['seuil_min']; ?></td>
-                            <td><?php echo htmlspecialchars($product['unit']); ?></td>
-                            <td><?php echo htmlspecialchars($product['location']); ?></td>
-                            <td><?php echo htmlspecialchars($product['fournisseur']); ?></td>
-                            <td><?php echo number_format($product['prix_achat'] * $product['current_stock'], 2); ?> TND</td>
-                            <td><span class="stock-badge <?php echo $statusBadge; ?>">
-                                <?php 
-                                    if ($statusBadge == 'stock-out') echo 'Out';
-                                    elseif ($statusBadge == 'stock-low') echo 'Low';
-                                    elseif ($statusBadge == 'stock-medium') echo 'Medium';
-                                    else echo 'High';
-                                ?>
-                            </span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn btn-entry" onclick="handleEntry(this.closest('tr'))">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    <button class="action-btn btn-exit" <?php echo ($product['current_stock'] == 0) ? 'disabled' : ''; ?> onclick="handleExit(this.closest('tr'))">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <button class="action-btn btn-edit" onclick="handleEdit(this.closest('tr'))">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="filter-group">
+                <label class="filter-label">Stock Status</label>
+                <select class="filter-input" id="stockFilter" onchange="applyFilters()">
+                    <option value="">All Levels</option>
+                    <option value="out">Out of Stock</option>
+                    <option value="low">Low Stock</option>
+                    <option value="medium">Medium Stock</option>
+                    <option value="high">High Stock</option>
+                </select>
             </div>
-        </div>
-    </main>
-
-    <!-- Entry Modal -->
-    <div id="entryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Stock Entry</h3>
-                <button class="close-btn" onclick="closeModal('entryModal')">&times;</button>
+            
+            <div class="filter-group">
+                <label class="filter-label">Supplier</label>
+                <select class="filter-input" id="supplierFilter" onchange="applyFilters()">
+                    <option value="">All Suppliers</option>
+                    <?php
+                    // Récupérer tous les fournisseurs uniques
+                    $suppliers = array_unique(array_column($products, 'fournisseur'));
+                    foreach ($suppliers as $supplier): ?>
+                        <option value="<?php echo htmlspecialchars($supplier); ?>"><?php echo htmlspecialchars($supplier); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-            <form id="entryForm">
-                <div class="form-group">
-                    <label class="form-label">Quantity to Add</label>
-                    <input type="number" class="form-input" id="entryQuantity" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Comment (optional)</label>
-                    <input type="text" class="form-input" id="entryComment">
-                </div>
-                <div class="form-buttons">
-                    <button type="button" class="btn-secondary" onclick="closeModal('entryModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Confirm</button>
-                </div>
-            </form>
+            
+            <div class="filter-group">
+                <label class="filter-label">Product Search</label>
+                <input type="text" class="filter-input" id="productSearch" placeholder="Enter product name..." onkeyup="applyFilters()">
+            </div>
+            
+            <div class="filter-group">
+                <button class="btn-primary" style="padding: 15px; width: 100%;" onclick="applyFilters()">
+                    Apply Filters
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Exit Modal -->
-    <div id="exitModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Stock Exit</h3>
-                <button class="close-btn" onclick="closeModal('exitModal')">&times;</button>
-            </div>
-            <form id="exitForm">
-                <div class="form-group">
-                    <label class="form-label">Quantity to Remove</label>
-                    <input type="number" class="form-input" id="exitQuantity" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Comment (optional)</label>
-                    <input type="text" class="form-input" id="exitComment">
-                </div>
-                <div class="form-buttons">
-                    <button type="button" class="btn-secondary" onclick="closeModal('exitModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Confirm</button>
-                </div>
-            </form>
+    <!-- Products Table Section -->
+    <div class="products-section">
+        <div class="section-header">
+            <h3 class="section-title">Stock Overview</h3>
+        </div>
+        
+        <div class="table-container">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Import Date</th>
+                        <th>Unit Price</th>
+                        <th>Current Stock</th>
+                        <th>Min. Stock</th>
+                        <th>Unit</th>
+                        <th>Supplier</th>
+                        <th>Total Value</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <?php foreach ($products as $product): ?>
+                    <?php 
+                        $stockClass = '';
+                        if ($product['current_stock'] == 0) {
+                            $stockClass = 'stock-out';
+                        } elseif ($product['current_stock'] < $product['seuil_min']) {
+                            $stockClass = 'stock-low';
+                        } else {
+                            $stockClass = 'stock-normal';
+                        }
+                        
+                        $statusBadge = '';
+                        if ($product['current_stock'] == 0) {
+                            $statusBadge = 'stock-out';
+                        } elseif ($product['current_stock'] < $product['seuil_min']) {
+                            $statusBadge = 'stock-low';
+                        } elseif ($product['current_stock'] >= $product['seuil_min'] * 2) {
+                            $statusBadge = 'stock-high';
+                        } else {
+                            $statusBadge = 'stock-medium';
+                        }
+                    ?>
+                    <tr class="<?php echo $stockClass; ?>" data-id="<?php echo $product['id_article']; ?>">
+                        <td><?php echo $product['id_article']; ?></td>
+                        <td><?php echo htmlspecialchars($product['nom']); ?></td>
+                        <td><?php echo htmlspecialchars($product['categorie_nom']); ?></td>
+                        <td><?php echo date('Y-m-d H:i', strtotime($product['date_importation'])); ?></td>
+                        <td><?php echo number_format($product['prix_unitaire'], 2); ?> TND</td>
+                        <td><?php echo $product['current_stock']; ?></td>
+                        <td><?php echo $product['seuil_min']; ?></td>
+                        <td><?php echo htmlspecialchars($product['unit']); ?></td>
+                        <td><?php echo htmlspecialchars($product['fournisseur']); ?></td>
+                        <td><?php echo number_format($product['prix_unitaire'] * $product['current_stock'], 2); ?> TND</td>
+                        <td><span class="stock-badge <?php echo $statusBadge; ?>">
+                            <?php 
+                                if ($statusBadge == 'stock-out') echo 'Out';
+                                elseif ($statusBadge == 'stock-low') echo 'Low';
+                                elseif ($statusBadge == 'stock-medium') echo 'Medium';
+                                else echo 'High';
+                            ?>
+                        </span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-entry" onclick="handleEntry(this.closest('tr'))">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="action-btn btn-exit" <?php echo ($product['current_stock'] == 0) ? 'disabled' : ''; ?> onclick="handleExit(this.closest('tr'))">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="action-btn btn-edit" onclick="handleEdit(this.closest('tr'))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
+</main>
 
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content" style="max-height: 80vh; display: flex; flex-direction: column;">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Product</h3>
-                <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
-            </div>
-            <form id="editForm" style="flex: 1; overflow-y: auto; padding-bottom: 20px;">
-                <div class="form-group">
-                    <label class="form-label">Product Name</label>
-                    <input type="text" class="form-input" id="editProductName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select class="form-input" id="editProductCategory" required>
-                        <?php
-                        $categories = array_unique(array_column($products, 'categorie_nom'));
-                        foreach ($categories as $category): ?>
-                            <option value="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unit Price (TND)</label>
-                    <input type="number" class="form-input" id="editProductPrice" step="0.01" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Current Stock</label>
-                    <input type="number" class="form-input" id="editCurrentStock" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Minimum Stock Level</label>
-                    <input type="number" class="form-input" id="editMinStock" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unit of Measure</label>
-                    <input type="text" class="form-input" id="editProductUnit" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" class="form-input" id="editProductLocation" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Supplier</label>
-                    <select class="form-input" id="editProductSupplier" required>
-                        <?php
-                        $suppliers = array_unique(array_column($products, 'fournisseur'));
-                        foreach ($suppliers as $supplier): ?>
-                            <option value="<?php echo htmlspecialchars($supplier); ?>"><?php echo htmlspecialchars($supplier); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-buttons">
-                    <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save</button>
-                </div>
-            </form>
+<!-- Entry Modal -->
+<div id="entryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Stock Entry</h3>
+            <button class="close-btn" onclick="closeModal('entryModal')">&times;</button>
         </div>
+        <form id="entryForm">
+            <div class="form-group">
+                <label class="form-label">Quantity to Add</label>
+                <input type="number" class="form-input" id="entryQuantity" min="1" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comment (optional)</label>
+                <input type="text" class="form-input" id="entryComment">
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="btn-secondary" onclick="closeModal('entryModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Confirm</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        // Global variables
-        let currentProductId = null;
-        let currentProductRow = null;
-        let allProducts = [];
+<!-- Exit Modal -->
+<div id="exitModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Stock Exit</h3>
+            <button class="close-btn" onclick="closeModal('exitModal')">&times;</button>
+        </div>
+        <form id="exitForm">
+            <div class="form-group">
+                <label class="form-label">Quantity to Remove</label>
+                <input type="number" class="form-input" id="exitQuantity" min="1" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Comment (optional)</label>
+                <input type="text" class="form-input" id="exitComment">
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="btn-secondary" onclick="closeModal('exitModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        // Initialize products data
-        function initializeProducts() {
-            const rows = document.querySelectorAll('#productsTableBody tr');
-            allProducts = Array.from(rows).map(row => {
-                const price = parseFloat(row.cells[3].textContent);
-                const currentStock = parseInt(row.cells[4].textContent);
-                const minStock = parseInt(row.cells[5].textContent);
-                const totalValue = price * currentStock;
-                
-                // Update total value column
-                row.cells[9].textContent = totalValue.toFixed(2) + ' TND';
-                
-                let status;
-                if (currentStock === 0) {
-                    status = 'out';
-                } else if (currentStock < minStock) {
-                    status = 'low';
-                } else if (currentStock >= minStock * 2) {
-                    status = 'high';
-                } else {
-                    status = 'medium';
-                }
-                
-                return {
-                    id: row.dataset.id,
-                    name: row.cells[1].textContent,
-                    category: row.cells[2].textContent,
-                    price: price,
-                    currentStock: currentStock,
-                    minStock: minStock,
-                    unit: row.cells[6].textContent,
-                    location: row.cells[7].textContent,
-                    supplier: row.cells[8].textContent,
-                    status: status,
-                    element: row
-                };
-            });
-        }
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content" style="max-height: 80vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Product</h3>
+            <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
+        </div>
+        <form id="editForm" style="flex: 1; overflow-y: auto; padding-bottom: 20px;">
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-input" id="editProductName" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-input" id="editProductCategory" required>
+                    <?php
+                    $categories = array_unique(array_column($products, 'categorie_nom'));
+                    foreach ($categories as $category): ?>
+                        <option value="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Unit Price (TND)</label>
+                <input type="number" class="form-input" id="editProductPrice" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Stock</label>
+                <input type="number" class="form-input" id="editCurrentStock" min="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Minimum Stock Level</label>
+                <input type="number" class="form-input" id="editMinStock" min="1" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Unit of Measure</label>
+                <input type="text" class="form-input" id="editProductUnit" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Supplier</label>
+                <input type="text" class="form-input" id="editProductSupplier" required>
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        function applyFilters() {
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            const stockFilter = document.getElementById('stockFilter').value;
-            const supplierFilter = document.getElementById('supplierFilter').value;
-            const searchQuery = document.getElementById('productSearch').value.toLowerCase();
+<script>
+    // Global variables
+    let currentProductId = null;
+    let currentProductRow = null;
+    let allProducts = [];
 
-            allProducts.forEach(product => {
-                const matchesCategory = categoryFilter === '' || 
-                    product.category === categoryFilter;
-                
-                const matchesStock = stockFilter === '' || 
-                    product.status === stockFilter;
-                
-                const matchesSupplier = supplierFilter === '' ||
-                    product.supplier === supplierFilter;
-                
-                const matchesSearch = searchQuery === '' || 
-                    product.name.toLowerCase().includes(searchQuery) ||
-                    product.category.toLowerCase().includes(searchQuery) ||
-                    product.id.toLowerCase().includes(searchQuery) ||
-                    product.supplier.toLowerCase().includes(searchQuery);
-                
-                if (matchesCategory && matchesStock && matchesSupplier && matchesSearch) {
-                    product.element.style.display = '';
-                } else {
-                    product.element.style.display = 'none';
-                }
-            });
-
-            updateAlertsSection();
-        }
-
-        // Update alerts section
-        function updateAlertsSection() {
-            const alertProducts = allProducts.filter(p => 
-                (p.status === 'out' || p.status === 'low') &&
-                p.element.style.display !== 'none'
-            );
-
-            const alertCount = alertProducts.length;
-            const alertsSection = document.getElementById('alertsSection');
+    // Initialize products data
+    function initializeProducts() {
+        const rows = document.querySelectorAll('#productsTableBody tr');
+        allProducts = Array.from(rows).map(row => {
+            const price = parseFloat(row.cells[4].textContent);
+            const currentStock = parseInt(row.cells[5].textContent);
+            const minStock = parseInt(row.cells[6].textContent);
+            const totalValue = price * currentStock;
             
-            if (alertCount > 0) {
-                alertsSection.style.display = '';
-                
-                const alertCountElement = document.querySelector('.alert-count');
-                const alertProductsContainer = document.querySelector('.alert-products');
-                
-                alertCountElement.textContent = alertCount;
-                
-                // Update alert products list
-                alertProductsContainer.innerHTML = '';
-                alertProducts.slice(0, 3).forEach(product => {
-                    const alertProduct = document.createElement('div');
-                    alertProduct.className = 'alert-product';
-                    alertProduct.innerHTML = `
-                        <div class="alert-product-name">${product.name}</div>
-                        <div class="alert-product-stock">
-                            Stock: ${product.status === 'out' ? 'Out' : product.currentStock + ' ' + product.unit}
-                        </div>
-                    `;
-                    alertProductsContainer.appendChild(alertProduct);
-                });
-            } else {
-                alertsSection.style.display = 'none';
-            }
-        }
-
-        // Handle entry button click
-        function handleEntry(row) {
-            currentProductId = row.dataset.id;
-            currentProductRow = row;
-            document.getElementById('entryModal').style.display = 'block';
-        }
-
-        // Handle exit button click
-        function handleExit(row) {
-            currentProductId = row.dataset.id;
-            currentProductRow = row;
-            document.getElementById('exitModal').style.display = 'block';
-        }
-
-        // Handle edit button click
-        function handleEdit(row) {
-            currentProductId = row.dataset.id;
-            currentProductRow = row;
+            // Update total value column
+            row.cells[9].textContent = totalValue.toFixed(2) + ' TND';
             
-            // Fill the form with current product data
-            document.getElementById('editProductName').value = row.cells[1].textContent;
-            document.getElementById('editProductCategory').value = row.cells[2].textContent;
-            document.getElementById('editProductPrice').value = parseFloat(row.cells[3].textContent);
-            document.getElementById('editCurrentStock').value = parseInt(row.cells[4].textContent);
-            document.getElementById('editMinStock').value = parseInt(row.cells[5].textContent);
-            document.getElementById('editProductUnit').value = row.cells[6].textContent;
-            document.getElementById('editProductLocation').value = row.cells[7].textContent;
-            document.getElementById('editProductSupplier').value = row.cells[8].textContent;
-            
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        // Close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Handle entry form submission
-        document.getElementById('entryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const quantity = parseInt(document.getElementById('entryQuantity').value);
-            const comment = document.getElementById('entryComment').value;
-            
-            // Update the stock in the table
-            const currentStockCell = currentProductRow.cells[4];
-            const priceCell = currentProductRow.cells[3];
-            const totalValueCell = currentProductRow.cells[9];
-            
-            const currentStock = parseInt(currentStockCell.textContent);
-            const price = parseFloat(priceCell.textContent);
-            
-            const newStock = currentStock + quantity;
-            currentStockCell.textContent = newStock;
-            totalValueCell.textContent = (price * newStock).toFixed(2) + ' TND';
-            
-            // Update row class based on new stock
-            updateRowStatus(currentProductRow);
-            
-            // Close modal and reset form
-            closeModal('entryModal');
-            document.getElementById('entryForm').reset();
-            
-            // Reinitialize products data
-            initializeProducts();
-            applyFilters();
-            
-            showAlert(`Entry of ${quantity} units recorded for ${currentProductRow.cells[1].textContent}`, 'success');
-        });
-
-        // Handle exit form submission
-        document.getElementById('exitForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const quantity = parseInt(document.getElementById('exitQuantity').value);
-            const comment = document.getElementById('exitComment').value;
-            
-            // Update the stock in the table
-            const currentStockCell = currentProductRow.cells[4];
-            const priceCell = currentProductRow.cells[3];
-            const totalValueCell = currentProductRow.cells[9];
-            
-            const currentStock = parseInt(currentStockCell.textContent);
-            const price = parseFloat(priceCell.textContent);
-            
-            const newStock = currentStock - quantity;
-            currentStockCell.textContent = newStock;
-            totalValueCell.textContent = (price * newStock).toFixed(2) + ' TND';
-            
-            // Update row class based on new stock
-            updateRowStatus(currentProductRow);
-            
-            // Close modal and reset form
-            closeModal('exitModal');
-            document.getElementById('exitForm').reset();
-            
-            // Reinitialize products data
-            initializeProducts();
-            applyFilters();
-            
-            showAlert(`Exit of ${quantity} units recorded for ${currentProductRow.cells[1].textContent}`, 'success');
-        });
-
-        // Handle edit form submission
-        document.getElementById('editForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Update the product in the table
-            currentProductRow.cells[1].textContent = document.getElementById('editProductName').value;
-            currentProductRow.cells[2].textContent = document.getElementById('editProductCategory').value;
-            currentProductRow.cells[3].textContent = document.getElementById('editProductPrice').value + ' TND';
-            currentProductRow.cells[4].textContent = document.getElementById('editCurrentStock').value;
-            currentProductRow.cells[5].textContent = document.getElementById('editMinStock').value;
-            currentProductRow.cells[6].textContent = document.getElementById('editProductUnit').value;
-            currentProductRow.cells[7].textContent = document.getElementById('editProductLocation').value;
-            currentProductRow.cells[8].textContent = document.getElementById('editProductSupplier').value;
-            
-            // Update total value
-            const price = parseFloat(document.getElementById('editProductPrice').value);
-            const stock = parseInt(document.getElementById('editCurrentStock').value);
-            currentProductRow.cells[9].textContent = (price * stock).toFixed(2) + ' TND';
-            
-            // Update row class based on new stock
-            updateRowStatus(currentProductRow);
-            
-            // Close modal and reset form
-            closeModal('editModal');
-            document.getElementById('editForm').reset();
-            
-            // Reinitialize products data
-            initializeProducts();
-            applyFilters();
-            
-            showAlert(`Product ${currentProductRow.cells[1].textContent} updated successfully`, 'success');
-        });
-
-        // Update row status based on stock
-        function updateRowStatus(row) {
-            const currentStock = parseInt(row.cells[4].textContent);
-            const minStock = parseInt(row.cells[5].textContent);
-            
-            // Remove all status classes
-            row.classList.remove('stock-out', 'stock-low', 'stock-normal');
-            
-            // Determine new status
+            let status;
             if (currentStock === 0) {
-                row.classList.add('stock-out');
-                // Disable exit button
-                row.querySelector('.btn-exit').disabled = true;
+                status = 'out';
             } else if (currentStock < minStock) {
-                row.classList.add('stock-low');
-                // Enable exit button
-                row.querySelector('.btn-exit').disabled = false;
-            } else {
-                row.classList.add('stock-normal');
-                // Enable exit button
-                row.querySelector('.btn-exit').disabled = false;
-            }
-            
-            // Update status badge
-            const statusBadge = row.querySelector('.stock-badge');
-            if (currentStock === 0) {
-                statusBadge.className = 'stock-badge stock-out';
-                statusBadge.textContent = 'Out';
-            } else if (currentStock < minStock) {
-                statusBadge.className = 'stock-badge stock-low';
-                statusBadge.textContent = 'Low';
+                status = 'low';
             } else if (currentStock >= minStock * 2) {
-                statusBadge.className = 'stock-badge stock-high';
-                statusBadge.textContent = 'High';
+                status = 'high';
             } else {
-                statusBadge.className = 'stock-badge stock-medium';
-                statusBadge.textContent = 'Medium';
+                status = 'medium';
+            }
+            
+            return {
+                id: row.dataset.id,
+                name: row.cells[1].textContent,
+                category: row.cells[2].textContent,
+                price: price,
+                currentStock: currentStock,
+                minStock: minStock,
+                unit: row.cells[7].textContent,
+                supplier: row.cells[8].textContent,
+                status: status,
+                element: row
+            };
+        });
+    }
+
+    function applyFilters() {
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const stockFilter = document.getElementById('stockFilter').value;
+        const supplierFilter = document.getElementById('supplierFilter').value;
+        const searchQuery = document.getElementById('productSearch').value.toLowerCase();
+
+        allProducts.forEach(product => {
+            const matchesCategory = categoryFilter === '' || 
+                product.category === categoryFilter;
+            
+            const matchesStock = stockFilter === '' || 
+                product.status === stockFilter;
+            
+            const matchesSupplier = supplierFilter === '' ||
+                product.supplier === supplierFilter;
+            
+            const matchesSearch = searchQuery === '' || 
+                product.name.toLowerCase().includes(searchQuery) ||
+                product.category.toLowerCase().includes(searchQuery) ||
+                product.id.toLowerCase().includes(searchQuery) ||
+                product.supplier.toLowerCase().includes(searchQuery);
+            
+            if (matchesCategory && matchesStock && matchesSupplier && matchesSearch) {
+                product.element.style.display = '';
+            } else {
+                product.element.style.display = 'none';
+            }
+        });
+    }
+
+    // Handle entry button click
+    function handleEntry(row) {
+        currentProductId = row.dataset.id;
+        currentProductRow = row;
+        document.getElementById('entryModal').style.display = 'block';
+    }
+
+    // Handle exit button click
+    function handleExit(row) {
+        currentProductId = row.dataset.id;
+        currentProductRow = row;
+        document.getElementById('exitModal').style.display = 'block';
+    }
+
+    // Handle edit button click
+    function handleEdit(row) {
+        currentProductId = row.dataset.id;
+        currentProductRow = row;
+        
+        // Fill the form with current product data
+        document.getElementById('editProductName').value = row.cells[1].textContent;
+        document.getElementById('editProductCategory').value = row.cells[2].textContent;
+        document.getElementById('editProductPrice').value = parseFloat(row.cells[4].textContent);
+        document.getElementById('editCurrentStock').value = parseInt(row.cells[5].textContent);
+        document.getElementById('editMinStock').value = parseInt(row.cells[6].textContent);
+        document.getElementById('editProductUnit').value = row.cells[7].textContent;
+        document.getElementById('editProductSupplier').value = row.cells[8].textContent;
+        
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    // Close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    // Update row status based on stock
+    function updateRowStatus(row) {
+        const currentStock = parseInt(row.cells[5].textContent);
+        const minStock = parseInt(row.cells[6].textContent);
+        
+        // Remove all status classes
+        row.classList.remove('stock-out', 'stock-low', 'stock-normal');
+        
+        // Determine new status
+        if (currentStock === 0) {
+            row.classList.add('stock-out');
+            // Disable exit button
+            row.querySelector('.btn-exit').disabled = true;
+        } else if (currentStock < minStock) {
+            row.classList.add('stock-low');
+            // Enable exit button
+            row.querySelector('.btn-exit').disabled = false;
+        } else {
+            row.classList.add('stock-normal');
+            // Enable exit button
+            row.querySelector('.btn-exit').disabled = false;
+        }
+        
+        // Update status badge
+        const statusBadge = row.querySelector('.stock-badge');
+        if (currentStock === 0) {
+            statusBadge.className = 'stock-badge stock-out';
+            statusBadge.textContent = 'Out';
+        } else if (currentStock < minStock) {
+            statusBadge.className = 'stock-badge stock-low';
+            statusBadge.textContent = 'Low';
+        } else if (currentStock >= minStock * 2) {
+            statusBadge.className = 'stock-badge stock-high';
+            statusBadge.textContent = 'High';
+        } else {
+            statusBadge.className = 'stock-badge stock-medium';
+            statusBadge.textContent = 'Medium';
+        }
+    }
+
+    // Show alert message
+    function showAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.textContent = message;
+        
+        // You can implement a proper notification system here
+        console.log(message);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeProducts();
+        applyFilters();
+    });
+    // Add this to your existing JavaScript in stockroom.php
+
+// Function to check for stock alerts and show notification
+function checkStockAlerts() {
+    const alertProducts = allProducts.filter(p => 
+        p.status === 'out' || p.status === 'low'
+    );
+    
+    if (alertProducts.length > 0) {
+        const alertBtn = document.createElement('a');
+        alertBtn.href = 'stockalerts.php';
+        alertBtn.className = 'alert-btn';
+        alertBtn.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${alertProducts.length} Alerts</span>
+        `;
+        
+        // Add styles for the alert button
+        const style = document.createElement('style');
+        style.textContent = `
+            .alert-btn {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 50px;
+                font-weight: 600;
+                text-decoration: none;
+                box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                z-index: 1000;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(alertBtn);
+    }
+}
+
+// Call this function after initializing products
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProducts();
+    applyFilters();
+    checkStockAlerts();
+    
+    // Check if we need to highlight a product from an alert
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product_id');
+    const alertType = urlParams.get('alert');
+    
+    if (productId && alertType) {
+        const row = document.querySelector(`tr[data-id="${productId}"]`);
+        if (row) {
+            setTimeout(() => {
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.style.animation = 'pulse 2s 3';
+                
+                // Remove the animation after it's done
+                setTimeout(() => {
+                    row.style.animation = '';
+                }, 6000);
+            }, 500);
+        }
+    }
+});
+// Add this to your existing JavaScript in stockroom.php
+function handleTabChange() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    
+    if (tab === 'history') {
+        // Show history tab/modal if implemented
+        console.log('Showing history tab');
+    } else if (tab === 'edit') {
+        // Show edit modal for the product
+        const productId = urlParams.get('product_id');
+        if (productId) {
+            const row = document.querySelector(`tr[data-id="${productId}"]`);
+            if (row) {
+                handleEdit(row);
             }
         }
+    }
+}
 
-        // Show alert message
-        function showAlert(message, type) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            // You can implement a proper notification system here
-            console.log(message);
+// Call this in your DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProducts();
+    applyFilters();
+    checkStockAlerts();
+    handleTabChange();
+});
+// Entry form submission
+document.getElementById('entryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const quantity = parseInt(document.getElementById('entryQuantity').value);
+
+    fetch('update_stock.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${currentProductId}&action=entry&quantity=${quantity}`
+    })
+    .then(res => res.text())
+    .then(response => {
+        if (response.trim() === "success") {
+            location.reload();
+        } else {
+            showAlert("Erreur lors de la sauvegarde", 'danger');
         }
+    });
+});
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeProducts();
-            applyFilters();
-        });
-    </script>
-</body>
-</html>
+// Exit form submission
+document.getElementById('exitForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const quantity = parseInt(document.getElementById('exitQuantity').value);
+
+    fetch('update_stock.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${currentProductId}&action=exit&quantity=${quantity}`
+    })
+    .then(res => res.text())
+    .then(response => {
+        if (response.trim() === "success") {
+            location.reload();
+        } else {
+            showAlert("Erreur lors de la sauvegarde", 'danger');
+        }
+    });
+});
+
+// Edit form submission
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('editProductName').value;
+    const category = document.getElementById('editProductCategory').value;
+    const price = document.getElementById('editProductPrice').value;
+    const currentStock = document.getElementById('editCurrentStock').value;
+    const minStock = document.getElementById('editMinStock').value;
+    const unit = document.getElementById('editProductUnit').value;
+    const supplier = document.getElementById('editProductSupplier').value;
+
+    fetch('update_stock.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${currentProductId}&action=edit&name=${encodeURIComponent(name)}&category=${encodeURIComponent(category)}&price=${price}&currentStock=${currentStock}&minStock=${minStock}&unit=${encodeURIComponent(unit)}&supplier=${encodeURIComponent(supplier)}`
+    })
+    .then(res => res.text())
+    .then(response => {
+        if (response.trim() === "success") {
+            location.reload();
+        } else {
+            showAlert("Erreur lors de la sauvegarde", 'danger');
+        }
+    });
+});
+
+</script>
