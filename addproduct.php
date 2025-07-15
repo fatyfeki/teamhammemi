@@ -410,14 +410,14 @@
         }
 
         /* File Upload Styles */
-        .file-upload {
+        .file-uploads {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
         }
 
-        .file-upload-preview {
+        .file-uploads-preview {
             width: 150px;
             height: 150px;
             border-radius: 12px;
@@ -432,31 +432,31 @@
             transition: all 0.3s ease;
         }
 
-        .file-upload-preview:hover {
+        .file-uploads-preview:hover {
             border-color: #8b0000;
             background-color: #fff;
         }
 
-        .file-upload-preview img {
+        .file-uploads-preview img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: none;
         }
 
-        .file-upload-preview i {
+        .file-uploads-preview i {
             font-size: 40px;
             color: #6c757d;
             margin-bottom: 10px;
         }
 
-        .file-upload-preview .preview-text {
+        .file-uploads-preview .preview-text {
             font-size: 12px;
             color: #6c757d;
             text-align: center;
         }
 
-        .file-upload-label {
+        .file-uploads-label {
             padding: 10px 20px;
             background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
             color: white;
@@ -470,16 +470,16 @@
             box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
         }
 
-        .file-upload-label:hover {
+        .file-uploads-label:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(139, 0, 0, 0.3);
         }
 
-        .file-upload-input {
+        .file-uploads-input {
             display: none;
         }
 
-        .file-upload-info {
+        .file-uploads-info {
             font-size: 12px;
             color: #6c757d;
             margin-top: 5px;
@@ -704,17 +704,17 @@
                     <!-- Product Image -->
                     <div class="form-group full-width">
                         <label class="form-label">Product Image</label>
-                        <div class="file-upload">
-                            <div class="file-upload-preview">
+                        <div class="file-uploads">
+                            <div class="file-uploads-preview">
                                 <i class="fas fa-box-open"></i>
                                 <span class="preview-text">No image selected</span>
                                 <img id="image-preview" src="#" alt="Preview">
                             </div>
-                            <label for="product_image" class="file-upload-label">
-                                <i class="fas fa-upload"></i> Choose Image
+                            <label for="product_image" class="file-uploads-label">
+                                <i class="fas fa-uploads"></i> Choose Image
                             </label>
-                            <input type="file" id="product_image" name="product_image" class="file-upload-input" accept="image/*">
-                            <span class="file-upload-info">Max size: 5MB (JPEG, PNG, GIF)</span>
+                            <input type="file" id="product_image" name="product_image" class="file-uploads-input" accept="image/*">
+                            <span class="file-uploads-info">Max size: 5MB (JPEG, PNG, GIF)</span>
                         </div>
                     </div>
                     
@@ -773,7 +773,7 @@
         document.getElementById('product_image').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const preview = document.getElementById('image-preview');
-            const previewContainer = document.querySelector('.file-upload-preview');
+            const previewContainer = document.querySelector('.file-uploads-preview');
             const icon = previewContainer.querySelector('i');
             const text = previewContainer.querySelector('.preview-text');
 
@@ -803,7 +803,7 @@
             
             // Reset image preview
             const preview = document.getElementById('image-preview');
-            const previewContainer = document.querySelector('.file-upload-preview');
+            const previewContainer = document.querySelector('.file-uploads-preview');
             const icon = previewContainer.querySelector('i');
             const text = previewContainer.querySelector('.preview-text');
             
