@@ -910,6 +910,7 @@ include "sys.php";
     </div>
 </div>
 
+
 <script>
     // Global variables
     let currentProductId = null;
@@ -1175,73 +1176,104 @@ document.addEventListener('DOMContentLoaded', function() {
     checkStockAlerts();
     handleTabChange();
 });
+// Fonction helper pour les requêtes
+async function makeRequest(url, data) {
+    try {
+        const formData = new URLSearchParams();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        });
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur:', error);
+        return { status: 'error', message: 'Erreur réseau' };
+    }
+}
+
 // Entry form submission
-document.getElementById('entryForm').addEventListener('submit', function(e) {
+document.getElementById('entryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const quantity = parseInt(document.getElementById('entryQuantity').value);
+    const comment = document.getElementById('entryComment').value;
 
-    fetch('update_stock.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `id=${currentProductId}&action=entry&quantity=${quantity}`
-    })
-    .then(res => res.text())
-    .then(response => {
-        if (response.trim() === "success") {
-            location.reload();
-        } else {
-            showAlert("Erreur lors de la sauvegarde", 'danger');
-        }
+    const result = await makeRequest('update_stock.php', {
+        id: currentProductId,
+        action: 'entry',
+        quantity: quantity,
+        comment: comment
     });
+
+    if (result.status === 'success') {
+        location.reload();
+    } else {
+        alert('Erreur: ' + (result.message || 'Action échouée'));
+    }
 });
 
 // Exit form submission
-document.getElementById('exitForm').addEventListener('submit', function(e) {
+document.getElementById('exitForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const quantity = parseInt(document.getElementById('exitQuantity').value);
+    const comment = document.getElementById('exitComment').value;
 
-    fetch('update_stock.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `id=${currentProductId}&action=exit&quantity=${quantity}`
-    })
-    .then(res => res.text())
-    .then(response => {
-        if (response.trim() === "success") {
-            location.reload();
-        } else {
-            showAlert("Erreur lors de la sauvegarde", 'danger');
-        }
+    // Vérification stock suffisant
+    const currentStock = parseInt(currentProductRow.cells[5].textContent);
+    if (quantity > currentStock) {
+        alert('Stock insuffisant!');
+        return;
+    }
+
+    const result = await makeRequest('update_stock.php', {
+        id: currentProductId,
+        action: 'exit',
+        quantity: quantity,
+        comment: comment
     });
+
+    if (result.status === 'success') {
+        location.reload();
+    } else {
+        alert('Erreur: ' + (result.message || 'Action échouée'));
+    }
 });
 
 // Edit form submission
-document.getElementById('editForm').addEventListener('submit', function(e) {
+document.getElementById('editForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const name = document.getElementById('editProductName').value;
-    const category = document.getElementById('editProductCategory').value;
-    const price = document.getElementById('editProductPrice').value;
-    const currentStock = document.getElementById('editCurrentStock').value;
-    const minStock = document.getElementById('editMinStock').value;
-    const unit = document.getElementById('editProductUnit').value;
-    const supplier = document.getElementById('editProductSupplier').value;
+    const formData = {
+        id: currentProductId,
+        action: 'edit',
+        name: document.getElementById('editProductName').value,
+        category: document.getElementById('editProductCategory').value,
+        price: document.getElementById('editProductPrice').value,
+        currentStock: document.getElementById('editCurrentStock').value,
+        minStock: document.getElementById('editMinStock').value,
+        unit: document.getElementById('editProductUnit').value,
+        supplier: document.getElementById('editProductSupplier').value
+    };
 
-    fetch('update_stock.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `id=${currentProductId}&action=edit&name=${encodeURIComponent(name)}&category=${encodeURIComponent(category)}&price=${price}&currentStock=${currentStock}&minStock=${minStock}&unit=${encodeURIComponent(unit)}&supplier=${encodeURIComponent(supplier)}`
-    })
-    .then(res => res.text())
-    .then(response => {
-        if (response.trim() === "success") {
-            location.reload();
-        } else {
-            showAlert("Erreur lors de la sauvegarde", 'danger');
-        }
-    });
+    // Validation
+    if (formData.currentStock < 0 || formData.minStock <= 0) {
+        alert('Stock invalide!');
+        return;
+    }
+
+    const result = await makeRequest('update_stock.php', formData);
+
+    if (result.status === 'success') {
+        location.reload();
+    } else {
+        alert('Erreur: ' + (result.message || 'Action échouée'));
+    }
 });
-
 </script>
