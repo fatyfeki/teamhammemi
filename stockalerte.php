@@ -18,7 +18,6 @@
             min-height: 100vh;
         }
 
-        /* Main Content */
         .main-content {
             margin-left: 280px;
             margin-top: 70px;
@@ -26,7 +25,6 @@
             min-height: calc(100vh - 70px);
         }
 
-        /* Page Header */
         .page-header {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             border-radius: 20px;
@@ -119,7 +117,6 @@
             letter-spacing: 1px;
         }
 
-        /* Alert Categories */
         .alert-categories {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -160,11 +157,6 @@
         .category-card.warning {
             --category-color: #ffc107;
             --category-color-light: #fff3cd;
-        }
-
-        .category-card.info {
-            --category-color: #17a2b8;
-            --category-color-light: #d1ecf1;
         }
 
         .category-header {
@@ -232,7 +224,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* Alert Details Section */
         .alert-details {
             background: white;
             border-radius: 20px;
@@ -279,7 +270,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        /* Alert Items */
         .alert-items {
             display: grid;
             gap: 20px;
@@ -392,29 +382,31 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
-            z-index: 2000;
+            z-index: 9999; /* Increased z-index to ensure it's on top */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
+            overflow: auto; /* Enable scrolling if needed */
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(8px);
         }
 
         .modal-content {
             background: white;
-            margin: 3% auto;
-            padding: 40px;
+            margin: 5% auto; /* Adjusted margin */
+            padding: 30px;
             border-radius: 20px;
             width: 90%;
             max-width: 600px;
             position: relative;
             animation: modalSlide 0.4s ease;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 90vh; /* Limit height */
+            overflow-y: auto; /* Enable scrolling for content */
         }
 
         @keyframes modalSlide {
@@ -470,11 +462,21 @@
             font-size: 14px;
         }
 
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
         .form-input {
             width: 100%;
-            padding: 15px;
+            padding: 12px 15px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 14px;
             transition: all 0.3s ease;
             background: #f8f9fa;
@@ -523,7 +525,24 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        /* Responsive */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 3000;
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
@@ -555,25 +574,137 @@
                 gap: 5px;
             }
         }
-
-        /* Notification Animation */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            z-index: 3000;
-            animation: slideInRight 0.5s ease;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        
+    /* Bulk Action Confirmation Modal */
+    .bulk-confirm-modal {
+        background: rgba(255,255,255,0.95);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        margin: 10% auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.1);
+        animation: fadeInUp 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bulk-confirm-modal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #dc3545, #ffc107);
+    }
+    
+    .bulk-confirm-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .bulk-confirm-icon {
+        font-size: 28px;
+        color: #dc3545;
+        background: rgba(220,53,69,0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bulk-confirm-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .bulk-confirm-body {
+        margin: 25px 0;
+        line-height: 1.6;
+        color: #555;
+    }
+    
+    .bulk-stats {
+        display: flex;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+    
+    .bulk-stat {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        flex: 1;
+        min-width: 100px;
+    }
+    
+    .bulk-stat-number {
+        font-size: 20px;
+        font-weight: 800;
+        color: #dc3545;
+        margin-bottom: 5px;
+    }
+    
+    .bulk-stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .supplier-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f1f1f1;
+        padding: 10px 15px;
+        border-radius: 50px;
+        margin: 10px 0;
+        font-weight: 600;
+    }
+    
+    .bulk-confirm-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .bulk-confirm-btn {
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+    }
+    
+    .bulk-confirm-primary {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+    
+    .bulk-confirm-secondary {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    
+    /* Small animation for the modal */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     </style>
 </head>
 <body>
@@ -600,11 +731,7 @@ try {
     });
     
     $lowStock = array_filter($products, function($product) {
-        return $product['current_stock'] > 0 && $product['current_stock'] <= $product['seuil_min'];
-    });
-    
-    $criticalStock = array_filter($products, function($product) {
-        return $product['current_stock'] <= ($product['seuil_min'] * 0.5);
+        return $product['current_stock'] > 0 && $product['current_stock'] < $product['seuil_min'];
     });
     
     $allAlerts = array_merge($outOfStock, $lowStock);
@@ -616,7 +743,6 @@ try {
 include "sys.php";
 ?>
 
-<!-- Main Content -->
 <!-- Main Content -->
 <main class="main-content">
     <!-- Page Header -->
@@ -699,30 +825,6 @@ include "sys.php";
                 </button>
             </div>
         </div>
-
-        <div class="category-card info">
-            <div class="category-header">
-                <div class="category-info">
-                    <i class="category-icon fas fa-info-circle"></i>
-                    <h3 class="category-title">Monitoring</h3>
-                </div>
-                <span class="category-count"><?php echo count($criticalStock); ?></span>
-            </div>
-            <p class="category-description">
-                Products approaching critical levels that should be monitored closely.
-            </p>
-            <div class="quick-actions">
-                <button class="action-btn" onclick="filterAlerts('info')">
-                    <i class="fas fa-eye"></i> View All
-                </button>
-                <button class="action-btn" onclick="setReminders()">
-                    <i class="fas fa-bell"></i> Set Reminders
-                </button>
-                <button class="action-btn" onclick="adjustThresholds()">
-                    <i class="fas fa-sliders-h"></i> Adjust Thresholds
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Alert Details -->
@@ -733,7 +835,6 @@ include "sys.php";
                 <button class="filter-tab active" onclick="filterAlerts('all')">All Alerts</button>
                 <button class="filter-tab" onclick="filterAlerts('critical')">Critical</button>
                 <button class="filter-tab" onclick="filterAlerts('warning')">Warning</button>
-                <button class="filter-tab" onclick="filterAlerts('info')">Monitor</button>
             </div>
         </div>
 
@@ -760,16 +861,15 @@ include "sys.php";
                     <button class="action-btn-small" onclick="quickRestock(<?php echo $product['id_article']; ?>)">
                         <i class="fas fa-plus"></i> Quick Restock
                     </button>
-                    <button class="action-btn-small" onclick="contactSupplier('<?php echo htmlspecialchars($product['fournisseur']); ?>')">
-                        <i class="fas fa-phone"></i> Contact Supplier
+                    <button class="action-btn-small" onclick="contactSupplier('<?php echo $product['fournisseur']; ?>', [<?php echo $product['id_article']; ?>])">
+                        <i class="fas fa-envelope"></i> Contact Supplier
                     </button>
                     <button class="action-btn-small" onclick="viewHistory(<?php echo $product['id_article']; ?>)">
                         <i class="fas fa-history"></i> View History
                     </button>
-                    <button class="action-btn-small" onclick="markAsHandled(<?php echo $product['id_article']; ?>)">
-                        <i class="fas fa-check"></i> Mark Handled
-                    </button>
+                    
                 </div>
+                
             </div>
             <?php endforeach; ?>
 
@@ -795,15 +895,13 @@ include "sys.php";
                     <button class="action-btn-small" onclick="quickRestock(<?php echo $product['id_article']; ?>)">
                         <i class="fas fa-plus"></i> Add Stock
                     </button>
-                    <button class="action-btn-small" onclick="createOrder(<?php echo $product['id_article']; ?>)">
-                        <i class="fas fa-shopping-cart"></i> Create Order
+                    <button class="action-btn-small" onclick="contactSupplier('<?php echo $product['fournisseur']; ?>', [<?php echo $product['id_article']; ?>])">
+                        <i class="fas fa-envelope"></i> Contact Supplier
                     </button>
                     <button class="action-btn-small" onclick="adjustThreshold(<?php echo $product['id_article']; ?>)">
                         <i class="fas fa-sliders-h"></i> Adjust Threshold
                     </button>
-                    <button class="action-btn-small" onclick="markAsHandled(<?php echo $product['id_article']; ?>)">
-                        <i class="fas fa-check"></i> Mark Handled
-                    </button>
+                    
                 </div>
             </div>
             <?php endforeach; ?>
@@ -819,21 +917,22 @@ include "sys.php";
             <button class="close-btn" onclick="closeModal('restockModal')">&times;</button>
         </div>
         <form id="restockForm">
+            <input type="hidden" id="restockProductId">
             <div class="form-group">
-                <label class="form-label">Product Name</label>
+                <label class="form-label">Product</label>
                 <input type="text" class="form-input" id="restockProductName" readonly>
             </div>
-            <div class="form-group">
-                <label class="form-label">Current Stock</label>
-                <input type="number" class="form-input" id="restockCurrentStock" readonly>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1; margin-right: 15px;">
+                    <label class="form-label">Current Stock</label>
+                    <input type="number" class="form-input" id="restockCurrentStock" readonly>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Minimum Threshold</label>
+                    <input type="number" class="form-input" id="restockMinStock" readonly>
+                </div>
             </div>
             <div class="form-group">
-                <label class="form-label">Minimum Stock</label>
-                <input type="number" class="form-input" id="restockMinStock" readonly>
-            </div>
-            <div class="form-group">
-                <label class="form-label">
-                                <div class="form-group">
                 <label class="form-label">Quantity to Add</label>
                 <input type="number" class="form-input" id="restockQuantity" min="1" required>
             </div>
@@ -849,9 +948,13 @@ include "sys.php";
                 <label class="form-label">Estimated Delivery Date</label>
                 <input type="date" class="form-input" id="restockDeliveryDate" required>
             </div>
+            <div class="form-group">
+                <label class="form-label">Comment</label>
+                <textarea class="form-input" id="restockComment" rows="3"></textarea>
+            </div>
             <div class="form-buttons">
                 <button type="button" class="btn-secondary" onclick="closeModal('restockModal')">Cancel</button>
-                <button type="submit" class="btn-primary">Confirm Restock</button>
+                <button type="submit" class="btn-primary">Confirm</button>
             </div>
         </form>
     </div>
@@ -863,12 +966,11 @@ include "sys.php";
 </div>
 
 <script>
-    // Fonctions pour les alertes
+    // Alert filtering
     function filterAlerts(type) {
         const alertItems = document.querySelectorAll('.alert-item');
         const tabs = document.querySelectorAll('.filter-tab');
         
-        // Mettre à jour les onglets actifs
         tabs.forEach(tab => {
             tab.classList.remove('active');
             if (tab.textContent.toLowerCase().includes(type)) {
@@ -876,21 +978,16 @@ include "sys.php";
             }
         });
         
-        // Filtrer les éléments d'alerte
         alertItems.forEach(item => {
             if (type === 'all') {
                 item.style.display = 'block';
             } else {
-                if (item.getAttribute('data-type') === type) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+                item.style.display = item.getAttribute('data-type') === type ? 'block' : 'none';
             }
         });
     }
     
-    // Fonctions pour les modales
+    // Modal functions
     function showModal(modalId) {
         document.getElementById(modalId).style.display = 'block';
     }
@@ -899,7 +996,7 @@ include "sys.php";
         document.getElementById(modalId).style.display = 'none';
     }
     
-    // Fonction pour afficher une notification
+    // Notification system
     function showNotification(message, isSuccess = true) {
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
@@ -918,383 +1015,338 @@ include "sys.php";
         }, 3000);
     }
     
-    // Fonctions spécifiques aux actions
+    // Quick Restock functionality
     function quickRestock(productId) {
-        // Ici, vous devriez récupérer les données du produit depuis votre base de données
-        // Pour l'exemple, nous utilisons des données statiques
-        const product = {
-            id: productId,
-            name: "Produit " + productId,
-            currentStock: 5,
-            minStock: 20,
-            supplier: "Fournisseur " + productId,
-            unitPrice: 15.99
-        };
+        const products = <?php echo json_encode($products); ?>;
+        const product = products.find(p => p.id_article == productId);
         
-        // Remplir le formulaire de réapprovisionnement
-        document.getElementById('restockProductName').value = product.name;
-        document.getElementById('restockCurrentStock').value = product.currentStock;
-        document.getElementById('restockMinStock').value = product.minStock;
-        document.getElementById('restockSupplier').value = product.supplier;
-        document.getElementById('restockUnitPrice').value = product.unitPrice;
-        
+        if (!product) {
+            showNotification("Produit non trouvé !", false);
+            return;
+        }
+
+        // Remplir le formulaire modal
+        document.getElementById('restockProductId').value = product.id_article;
+        document.getElementById('restockProductName').value = product.nom;
+        document.getElementById('restockCurrentStock').value = product.current_stock;
+        document.getElementById('restockMinStock').value = product.seuil_min;
+        document.getElementById('restockSupplier').value = product.fournisseur;
+        document.getElementById('restockUnitPrice').value = product.prix_unitaire;
+        document.getElementById('restockComment').value = '';
+
         // Définir la date de livraison par défaut (3 jours à partir d'aujourd'hui)
         const deliveryDate = new Date();
         deliveryDate.setDate(deliveryDate.getDate() + 3);
         document.getElementById('restockDeliveryDate').valueAsDate = deliveryDate;
-        
-        // Afficher la modal
+
+        // Afficher le modal
         showModal('restockModal');
     }
-    
-    function contactSupplier(supplierName) {
-        showNotification(`Supplier ${supplierName} contacted successfully.`);
-    }
-    
-    function viewHistory(productId) {
-        showNotification(`Viewing history for product ID: ${productId}`);
-    }
-    
-    function markAsHandled(productId) {
-        showNotification(`Alert for product ID: ${productId} marked as handled.`);
-    }
-    
-    function createOrder(productId) {
-        showNotification(`Purchase order created for product ID: ${productId}`);
-    }
-    
-    function adjustThreshold(productId) {
-        showNotification(`Adjusting threshold for product ID: ${productId}`);
-    }
-    
-    function generateReport(type) {
-    // Open report in a new tab
-    window.open(`report_view.php?type=${type}`, '_blank');
-    
-    // Or alternatively, show in the same window:
-    // window.location.href = `report_view.php?type=${type}`;
-    
-    showNotification(`Report generated successfully!`);
-}
-    
-   function bulkAction(action) {
-    let alertItems, message, productIds = [];
-    
-    if (action === 'restock') {
-        alertItems = document.querySelectorAll('.alert-item.critical');
-        message = "Êtes-vous sûr de vouloir commander en masse tous les produits en rupture de stock?";
-    } 
-    else if (action === 'order') {
-        alertItems = document.querySelectorAll('.alert-item.warning');
-        message = "Êtes-vous sûr de vouloir commander en masse tous les produits en stock faible?";
-    }
-    
-    alertItems.forEach(alert => {
-        const button = alert.querySelector('.alert-item-actions button');
-        const match = button.getAttribute('onclick').match(/\((?:'|")?(\d+)(?:'|")?\)/);
-        if (match && match[1]) {
-            productIds.push(match[1]);
-        }
-    });
-    
-    if (productIds.length === 0) {
-        const msg = action === 'restock' 
-            ? 'Aucune alerte critique à réapprovisionner!' 
-            : 'Aucun produit en stock faible à commander!';
-        showNotification(msg, false);
-        return;
-    }
-    
-    if (confirm(message)) {
-        window.location.href = `commande_groupée.php?products=${productIds.join(',')}&type=${action}`;
-    }
-}
-    
-    function setReminders() {
-    // 1. Récupère tous les produits avec alertes (version plus fiable)
-    const alertItems = document.querySelectorAll('.alert-item');
-    const products = [];
-    
-    alertItems.forEach(item => {
-        try {
-            const id = item.querySelector('button').getAttribute('onclick')
-                         .match(/(quickRestock|createOrder|adjustThreshold)\((\d+)\)/)[2];
-            const name = item.querySelector('.alert-item-title').textContent;
-            const type = item.getAttribute('data-type');
-            
-            products.push({ id, name, type });
-        } catch (e) {
-            console.error("Erreur analyse produit:", e);
-        }
-    });
-    
-    if (products.length === 0) {
-        showNotification("No products found to set reminders!", false);
-        return;
-    }
 
-    // 2. Crée le modal (version simplifiée)
-    const modalId = 'reminderModal';
-    if (document.getElementById(modalId)) return; // Empêche les doublons
-    
-    const modalHTML = `
-    <div id="${modalId}" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Set Reminders</h3>
-                <button class="close-btn" onclick="closeModal('${modalId}')">&times;</button>
-            </div>
-            <div style="padding: 20px;">
-                <p>This feature would set reminders for ${products.length} products.</p>
-                <div style="margin: 15px 0;">
-                    <label>Frequency:</label>
-                    <select id="reminderFreq" class="form-input">
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                    </select>
-                </div>
-                <button onclick="confirmReminders()" class="btn-primary">
-                    Confirm Reminders
-                </button>
-            </div>
-        </div>
-    </div>`;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    showModal(modalId);
-}
-
-// Fonction helper pour la confirmation
-function confirmReminders() {
-    const frequency = document.getElementById('reminderFreq').value;
-    showNotification(`Reminders set to ${frequency}! Check browser console for details.`);
-    closeModal('reminderModal');
-    
-    // Debug: affiche ce qui serait envoyé au serveur
-    console.log("Reminders configuration:", {
-        frequency,
-        timestamp: new Date()
-    });
-}
- function adjustThresholds() {
-    // 1. Récupération des produits de manière robuste
-    const products = Array.from(document.querySelectorAll('.alert-item')).map(item => {
-        try {
-            // Meilleure méthode pour récupérer l'ID
-            const buttons = item.querySelectorAll('button');
-            let productId = null;
-            
-            for (const button of buttons) {
-                const onclick = button.getAttribute('onclick') || '';
-                const match = onclick.match(/(\d+)/);
-                if (match) {
-                    productId = match[0];
-                    break;
-                }
-            }
-            if (!productId) return null;
-
-            // Extraction fiable des données
-            const name = item.querySelector('.alert-item-title')?.textContent?.trim() || `Product ${productId}`;
-            const desc = item.querySelector('.alert-item-description')?.innerHTML || '';
-            
-            const currentStock = desc.match(/Current stock:[^<]*<strong>(\d+)/i)?.[1] || '0';
-            const minStock = desc.match(/Minimum required:[^<]*<strong>(\d+)/i)?.[1] || '0';
-
-            return {
-                id: productId,
-                name,
-                currentStock,
-                minStock
-            };
-        } catch (e) {
-            console.error("Error processing product:", e);
-            return null;
-        }
-    }).filter(p => p !== null);
-
-    if (products.length === 0) {
-        showNotification("No products found for threshold adjustment", false);
-        return;
-    }
-
-    // 2. Création du modal avec gestion des doublons
-    const modalId = 'thresholdAdjustmentModal';
-    const existingModal = document.getElementById(modalId);
-    if (existingModal) existingModal.remove();
-
-    const modalHTML = `
-    <div id="${modalId}" class="modal">
-        <div class="modal-content" style="max-width:800px">
-            <div class="modal-header">
-                <h3>Adjust Stock Thresholds</h3>
-                <button class="close-btn" onclick="closeModalAndReload()">&times;</button>
-            </div>
-            <div style="max-height:60vh;overflow-y:auto;margin:20px 0">
-                <table style="width:100%;border-collapse:collapse">
-                    <thead>
-                        <tr style="background:#f8f9fa">
-                            <th style="padding:12px;text-align:left">Product</th>
-                            <th style="padding:12px;text-align:center">Current</th>
-                            <th style="padding:12px;text-align:center">Threshold</th>
-                            <th style="padding:12px;text-align:center">New</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${products.map(p => `
-                        <tr>
-                            <td style="padding:12px">
-                                ${p.name}
-                                <input type="hidden" class="product-id" value="${p.id}">
-                            </td>
-                            <td style="padding:12px;text-align:center">${p.currentStock}</td>
-                            <td style="padding:12px;text-align:center">${p.minStock}</td>
-                            <td style="padding:12px;text-align:center">
-                                <input type="number" class="threshold-input form-input" 
-                                       value="${p.minStock}" 
-                                       min="1" 
-                                       required
-                                       style="width:80px;text-align:center">
-                            </td>
-                        </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-            <div class="form-buttons" style="margin-top:20px">
-                <button type="button" class="btn-secondary" onclick="closeModalAndReload()">
-                    Cancel
-                </button>
-                <button type="button" class="btn-primary" id="saveThresholdsBtn">
-                    Save Changes
-                </button>
-            </div>
-        </div>
-    </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // 3. Fonction de fermeture
-    window.closeModalAndReload = function() {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.remove();
-        location.reload();
-    };
-
-    // 4. Gestion de l'enregistrement
-    document.getElementById('saveThresholdsBtn').addEventListener('click', async function() {
-        const inputs = document.querySelectorAll(`#${modalId} .threshold-input`);
-        const updates = [];
-        let isValid = true;
-
-        // Validation
-        inputs.forEach(input => {
-            if (!input.value || isNaN(input.value) || input.value < 1) {
-                input.style.border = '2px solid red';
-                isValid = false;
-            } else {
-                updates.push({
-                    productId: input.closest('tr').querySelector('.product-id').value,
-                    newThreshold: input.value
-                });
-            }
-        });
-
-        if (!isValid || updates.length === 0) {
-            showNotification("Please enter valid threshold values", false);
-            return;
-        }
-
-        // Envoi des données
-        try {
-            const response = await fetch('update_thresholds.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ updates })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.message || "Failed to save thresholds");
-            }
-
-            showNotification("Thresholds updated successfully!");
-            setTimeout(closeModalAndReload, 1500);
-
-        } catch (error) {
-            console.error("Save error:", error);
-            showNotification(`Error: ${error.message}`, false);
-        }
-    });
-
-    // Affichage du modal
-    document.getElementById(modalId).style.display = 'block';
-}
-</script>
-<script>
-    // Check if we need to highlight a specific alert
-    document.addEventListener('DOMContentLoaded', function() {
-        const alertType = "<?php echo $alertType; ?>";
-        const productId = <?php echo $productId; ?>;
-        
-        if (alertType && productId) {
-            // Filter to show the specific alert type
-            filterAlerts(alertType);
-            
-            // Scroll to and highlight the specific product
-            setTimeout(() => {
-                const alertItem = document.querySelector(`.alert-item[data-type="${alertType}"][data-id="${productId}"]`);
-                if (alertItem) {
-                    alertItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    alertItem.style.animation = 'pulse 2s 3';
-                    
-                    // Remove the animation after it's done
-                    setTimeout(() => {
-                        alertItem.style.animation = '';
-                    }, 6000);
-                }
-            }, 500);
-        }
-        
-        // Initialize any other necessary functions
-    });
-
-    // Modify the quickRestock function to redirect to stockroom.php after restock
+    // Gestion de la soumission du formulaire
     document.getElementById('restockForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const quantity = document.getElementById('restockQuantity').value;
-        const productName = document.getElementById('restockProductName').value;
-        const productId = <?php echo $productId ?? 'null'; ?>;
+        // Récupérer les valeurs du formulaire
+        const productId = document.getElementById('restockProductId').value;
+        const quantity = parseInt(document.getElementById('restockQuantity').value);
+        const unitPrice = parseFloat(document.getElementById('restockUnitPrice').value);
+        const deliveryDate = document.getElementById('restockDeliveryDate').value;
+        const comment = document.getElementById('restockComment').value;
+
+        // Validation simple
+        if (quantity <= 0) {
+            showNotification("La quantité doit être supérieure à 0", false);
+            return;
+        }
+
+        // Afficher l'état de chargement
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
+        submitBtn.disabled = true;
+
+        // Envoyer les données via AJAX
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_stock.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         
-        // Here you would normally send data to server
-        // For now we'll just show notification and redirect
-        showNotification(`${quantity} units of ${productName} added to restock list.`);
-        closeModal('restockModal');
-        this.reset();
+        xhr.onload = function() {
+            if (this.status === 200) {
+                try {
+                    const response = JSON.parse(this.responseText);
+                    if (response.status === 'success') {
+                        showNotification("Réapprovisionnement confirmé avec succès !");
+                        closeModal('restockModal');
+                        
+                        // Recharger la page après un délai
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showNotification(response.message || "Erreur lors de la mise à jour", false);
+                    }
+                } catch (e) {
+                    showNotification("Erreur de traitement de la réponse", false);
+                }
+            } else {
+                showNotification("Erreur de communication avec le serveur", false);
+            }
+            
+            // Restaurer le bouton
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        };
         
-        // Redirect to stockroom.php after a delay
-        setTimeout(() => {
-            window.location.href = 'stockroom.php';
-        }, 1500);
+        xhr.onerror = function() {
+            showNotification("Erreur réseau", false);
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        };
+        
+        const params = `id=${productId}&action=entry&quantity=${quantity}&comment=${encodeURIComponent(comment)}`;
+        xhr.send(params);
     });
 
-    // Modify action functions to link with stockroom.php
+    // Contact Supplier function - redirects to commande_groupée.php
+    function contactSupplier(supplierName, productIds) {
+        const idsString = productIds.join(',');
+        window.location.href = `commande_groupée.php?fournisseur=${encodeURIComponent(supplierName)}&products=${idsString}`;
+    }
+
+    // Bulk actions (restock/order)
+   function bulkAction(action) {
+    // Déterminer quels produits sont concernés selon l'action
+    const alertSelector = action === 'restock' 
+        ? '.alert-item.critical' 
+        : '.alert-item.warning';
+    
+    const alertItems = document.querySelectorAll(alertSelector);
+    
+    // Vérifier s'il y a des produits à traiter
+    if (alertItems.length === 0) {
+        const message = action === 'restock'
+            ? "Aucun produit en rupture de stock à réapprovisionner !"
+            : "Aucun produit en stock faible à commander !";
+        showNotification(message, false);
+        return;
+    }
+
+    // Collecter les IDs des produits et leurs fournisseurs
+    const productsData = [];
+    const supplierCounts = {};
+    
+    alertItems.forEach(item => {
+        try {
+            // Récupérer l'ID du produit
+            const firstActionBtn = item.querySelector('.alert-item-actions button:first-child');
+            const productId = firstActionBtn.getAttribute('onclick').match(/\d+/)[0];
+            
+            // Récupérer le nom du fournisseur
+            const supplierElement = item.querySelector('.alert-item-meta span:nth-child(2)');
+            const supplierName = supplierElement.textContent.trim();
+            
+            // Stocker les données
+            productsData.push({
+                id: productId,
+                supplier: supplierName
+            });
+            
+            // Compter les fournisseurs
+            supplierCounts[supplierName] = (supplierCounts[supplierName] || 0) + 1;
+        } catch (error) {
+            console.error("Erreur lors du traitement d'un produit:", error);
+        }
+    });
+
+    // Trouver le fournisseur le plus fréquent
+    const mostCommonSupplier = Object.keys(supplierCounts).reduce((a, b) => 
+        supplierCounts[a] > supplierCounts[b] ? a : b);
+    
+    // Extraire seulement les IDs des produits
+    const productIds = productsData.map(p => p.id);
+    
+    // Message de confirmation
+    const confirmationMessage = action === 'restock'
+        ? `Voulez-vous vraiment réapprovisionner ${productIds.length} produit(s) en rupture de stock chez ${mostCommonSupplier} ?`
+        : `Voulez-vous vraiment commander ${productIds.length} produit(s) en stock faible chez ${mostCommonSupplier} ?`;
+    
+    // Demander confirmation
+    if (confirm(confirmationMessage)) {
+        // Redirection vers la page de commande groupée
+        window.location.href = `commande_groupée.php?fournisseur=${
+            encodeURIComponent(mostCommonSupplier)
+        }&products=${
+            productIds.join(',')
+        }&type=${
+            action
+        }&bulk_action=true`;
+    } else {
+        showNotification('Action annulée', false);
+    }
+}
+
+    // Other action functions
     function viewHistory(productId) {
         window.location.href = `stockroom.php?product_id=${productId}&tab=history`;
+    }
+    
+   
+
+    function updateAlertCounters() {
+        // Get all visible alerts (not marked as handled)
+        const criticalAlerts = document.querySelectorAll('.alert-item.critical:not([style*="opacity: 0.5"])').length;
+        const warningAlerts = document.querySelectorAll('.alert-item.warning:not([style*="opacity: 0.5"])').length;
+        const totalAlerts = criticalAlerts + warningAlerts;
+        
+        // Update UI counters
+        document.querySelector('.category-card.critical .category-count').textContent = criticalAlerts;
+        document.querySelector('.category-card.warning .category-count').textContent = warningAlerts;
+        document.querySelector('.alerts-summary .summary-item:nth-child(1) .summary-number').textContent = totalAlerts;
+        document.querySelector('.alerts-summary .summary-item:nth-child(2) .summary-number').textContent = criticalAlerts;
+        document.querySelector('.alerts-summary .summary-item:nth-child(3) .summary-number').textContent = warningAlerts;
     }
 
     function adjustThreshold(productId) {
         window.location.href = `stockroom.php?product_id=${productId}&tab=edit`;
     }
+    
+    function generateReport(type) {
+        window.open(`report_view.php?type=${type}`, '_blank');
+        showNotification(`${type} report generated successfully!`);
+    }
 
-    // Add this function to handle clicks on alert items
-    function handleAlertClick(productId, alertType) {
-        window.location.href = `stockroom.php?product_id=${productId}&alert=${alertType}`;
+    // Show welcome message on load
+    window.onload = function() {
+        const userName = "<?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin'; ?>";
+        setTimeout(() => {
+            showNotification(`Welcome back, ${userName}! You have <?php echo count($allAlerts); ?> stock alerts to review.`);
+        }, 1000);
+    };
+</script>
+<script>
+    // Enhanced bulkAction function with stylish confirmation
+    function bulkAction(action) {
+        // Determine which products are concerned by the action
+        const alertSelector = action === 'restock' 
+            ? '.alert-item.critical' 
+            : '.alert-item.warning';
+        
+        const alertItems = document.querySelectorAll(alertSelector);
+        
+        // Check if there are products to process
+        if (alertItems.length === 0) {
+            const message = action === 'restock'
+                ? "No out-of-stock products to restock!"
+                : "No low-stock products to order!";
+            showNotification(message, false);
+            return;
+        }
+
+        // Collect product data and count suppliers
+        const productsData = [];
+        const supplierCounts = {};
+        
+        alertItems.forEach(item => {
+            try {
+                const firstActionBtn = item.querySelector('.alert-item-actions button:first-child');
+                const productId = firstActionBtn.getAttribute('onclick').match(/\d+/)[0];
+                
+                const supplierElement = item.querySelector('.alert-item-meta span:nth-child(2)');
+                const supplierName = supplierElement.textContent.trim();
+                
+                productsData.push({
+                    id: productId,
+                    supplier: supplierName
+                });
+                
+                supplierCounts[supplierName] = (supplierCounts[supplierName] || 0) + 1;
+            } catch (error) {
+                console.error("Error processing product:", error);
+            }
+        });
+
+        // Find the most common supplier
+        const mostCommonSupplier = Object.keys(supplierCounts).reduce((a, b) => 
+            supplierCounts[a] > supplierCounts[b] ? a : b);
+        
+        // Create a modal for confirmation
+        const modalHtml = `
+            <div class="bulk-confirm-modal">
+                <div class="bulk-confirm-header">
+                    <div class="bulk-confirm-icon">
+                        <i class="fas fa-${action === 'restock' ? 'boxes' : 'shopping-cart'}"></i>
+                    </div>
+                    <h3 class="bulk-confirm-title">
+                        Confirm Bulk ${action === 'restock' ? 'Restock' : 'Order'}
+                    </h3>
+                </div>
+                
+                <div class="bulk-confirm-body">
+                    <p>You're about to process ${alertItems.length} products with ${Object.keys(supplierCounts).length} suppliers.</p>
+                    
+                    <div class="bulk-stats">
+                        <div class="bulk-stat">
+                            <div class="bulk-stat-number">${alertItems.length}</div>
+                            <div class="bulk-stat-label">Total Items</div>
+                        </div>
+                        <div class="bulk-stat">
+                            <div class="bulk-stat-number">${Object.keys(supplierCounts).length}</div>
+                            <div class="bulk-stat-label">Suppliers</div>
+                        </div>
+                    </div>
+                    
+                    <p>Main supplier:</p>
+                    <div class="supplier-chip">
+                        <i class="fas fa-building"></i>
+                        ${mostCommonSupplier}
+                    </div>
+                </div>
+                
+                <div class="bulk-confirm-footer">
+                    <button class="bulk-confirm-btn bulk-confirm-secondary" onclick="this.closest('.modal').style.display='none'">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="bulk-confirm-btn bulk-confirm-primary" onclick="proceedWithBulkAction('${mostCommonSupplier}', [${productsData.map(p => p.id).join(',')}], '${action}')">
+                        <i class="fas fa-check"></i> Confirm
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Create and show modal
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.innerHTML = modalHtml;
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    }
+    
+    // Function to proceed with the bulk action
+    function proceedWithBulkAction(supplier, productIds, action) {
+        // Close all modals
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        
+        // Show processing notification
+        showNotification(`Processing ${productIds.length} items...`, true);
+        
+        // Redirect to grouped order page
+        setTimeout(() => {
+            window.location.href = `commande_groupée.php?fournisseur=${
+                encodeURIComponent(supplier)
+            }&products=${
+                productIds.join(',')
+            }&type=${
+                action
+            }&bulk_action=true`;
+        }, 500);
     }
 </script>
 </body>

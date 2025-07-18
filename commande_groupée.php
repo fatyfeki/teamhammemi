@@ -6,7 +6,23 @@ $pdo = new PDO("mysql:host=localhost;dbname=ch office track", "root", "");
 session_start();
 
 // Récupérer les produits depuis l'URL
-$productIds = explode(',', $_GET['products'] ?? '');
+$productIdsParam = $_GET['products'] ?? '';
+
+if (empty($productIdsParam)) {
+    die('Aucun produit sélectionné.');
+}
+
+$productIds = explode(',', $productIdsParam);
+
+// Sécuriser les IDs (entiers)
+$productIds = array_filter($productIds, function($id) {
+    return ctype_digit($id);
+});
+
+if (count($productIds) === 0) {
+    die('Aucun produit valide sélectionné.');
+}
+
 $placeholders = implode(',', array_fill(0, count($productIds), '?'));
 
 // Récupérer les infos produits
@@ -14,31 +30,40 @@ $stmt = $pdo->prepare("SELECT * FROM article WHERE id_article IN ($placeholders)
 $stmt->execute($productIds);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+if (!$products) {
+    die('Aucun produit trouvé.');
+}
+
+// Prendre le fournisseur du premier produit (à adapter selon ta logique)
+$fournisseur = $products[0]['fournisseur'] ?? 'Fournisseur principal';
+
 // Traitement du formulaire
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
-        
-        // Générer une référence de commande
+
+        // Générer une référence de commande unique
         $reference = 'CMD-' . date('Y') . '-' . str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
-        
+
         // Créer la commande principale
         $stmt = $pdo->prepare("INSERT INTO commande 
                               (reference, fournisseur, date_livraison_prevue, id_utilisateur, notes) 
                               VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
-            $reference,
-            $_POST['fournisseur'] ?? '',
+            $_POST['reference'] ?? $reference,
+            $_POST['fournisseur'] ?? $fournisseur,
             $_POST['date_livraison'],
             $_SESSION['user_id'] ?? 1,
             $_POST['notes']
         ]);
         $commandeId = $pdo->lastInsertId();
-        
+
         // Ajouter les items
         $totalHT = 0;
         foreach ($products as $product) {
-            $quantite = $_POST['quantite_'.$product['id_article'] ?? 0];
+            $quantite = $_POST['quantite_' . $product['id_article']] ?? 0;
+            $quantite = (int)$quantite;
             if ($quantite > 0) {
                 $prix_unitaire = $product['prix_unitaire'];
                 $stmt = $pdo->prepare("INSERT INTO lignecommande 
@@ -50,25 +75,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $quantite,
                     $prix_unitaire
                 ]);
-                
                 $totalHT += $quantite * $prix_unitaire;
             }
         }
-        
+
         // Mettre à jour le total HT de la commande
         $stmt = $pdo->prepare("UPDATE commande SET total_ht = ? WHERE id_commande = ?");
         $stmt->execute([$totalHT, $commandeId]);
-        
+
         $pdo->commit();
+
         header("Location: commandes.php?success=1&id=$commandeId");
         exit;
-        
+
     } catch (Exception $e) {
         $pdo->rollBack();
         $error = "Erreur: " . $e->getMessage();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -341,8 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST">
             <div class="form-group">
                 <label>Fournisseur</label>
-                <input type="text" name="fournisseur" class="form-input" value="Fournisseur principal" required>
-            </div>
+                <input type="text" name="fournisseur" class="form-input" value="<?php echo htmlspecialchars($fournisseur); ?>" required>            </div>
             
             <div class="form-group">
                 <label>Date de livraison prévue</label>
