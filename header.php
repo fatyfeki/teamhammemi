@@ -252,14 +252,7 @@
       <a href="partner.php">Partner</a>
       <a href="aboutus.php">About Us</a>
     </nav>
-    <div class="auth-buttons">
-      <a href="login.php"><button class="login-btn">Login</button></a>
-      <a href="signup.php"><button class="signup-btn">Sign Up</button></a>
-      <div class="lang">
-        <img src="ang.png" alt="English" />
-        <span>English</span>
-      </div>
-    </div>
+    
   </header>
 
   <div class="search-bar">
