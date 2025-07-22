@@ -1,32 +1,46 @@
 <?php
-session_start();
-
-// Associative array containing authorized admin credentials
-$valid_admin = [
-    'email' => 'admin@test.com',
-    'password' => 'admin123', 
-    'code' => 'ADMIN2024'
-];
+require_once "db.php";
+$hashed_password = password_hash("admin---2025__*", PASSWORD_DEFAULT);
+$pdo->query("UPDATE admin SET mot_de_passe = '$hashed_password' WHERE id = 1");
+echo "Mot de passe hashé mis à jour !";
 
 // Form processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $code = $_POST['code'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $code = trim($_POST['code'] ?? '');
 
-    if ($email === $valid_admin['email'] && 
-        $password === $valid_admin['password'] && 
-        $code === $valid_admin['code']) {
-        
-        $_SESSION['admin_logged'] = true;
-        header('Location: TB.php');
-        exit();
-    } else {
-        $error = "Invalid credentials";
+    try {
+        // Vérification dans la base de données
+        $stmt = $pdo->prepare("SELECT * FROM admin WHERE email = :email");
+        $stmt->execute(['email' => $email]);
+        $admin = $stmt->fetch();
+
+        if ($admin) {
+            // Vérification du mot de passe hashé
+            if (password_verify($password, $admin['mot_de_passe'])) {
+                // Vérification du code admin (case sensitive)
+                if ($code === $admin['code_admin']) {
+                    $_SESSION['admin_logged'] = true;
+                    $_SESSION['admin_email'] = $email;
+                    $_SESSION['admin_id'] = $admin['id'];
+                    header('Location: TB.php');
+                    exit();
+                } else {
+                    $error = "Code admin incorrect";
+                }
+            } else {
+                $error = "Mot de passe incorrect";
+            }
+        } else {
+            $error = "Aucun compte admin trouvé avec cet email";
+        }
+    } catch (PDOException $e) {
+        $error = "Erreur de base de données : " . $e->getMessage();
     }
 }
 ?>
-<?php include("header.php"); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -160,19 +174,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border: 1px solid rgba(220, 53, 69, 0.3);
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 30px 20px;
-        }
-    }
     .login-links {
         margin-top: 15px;
         text-align: center;
     }
 
     .login-links a {
-        color:rgb(54, 50, 51);
+        color: rgb(54, 50, 51);
         text-decoration: none;
         font-weight: bold;
         margin: 0 10px;
@@ -181,9 +189,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .login-links a:hover {
         text-decoration: underline;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 30px 20px;
+        }
+    }
     </style>
 </head>
 <body>
+    <?php include("header.php"); ?>
+    
     <section class="login-section">
         <div class="container">
             <div class="form-container">
@@ -196,13 +213,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <?php if (isset($error)): ?>
                     <div class="message error">
-                        <p><?= $error ?></p>
+                        <p><?= htmlspecialchars($error) ?></p>
                     </div>
                 <?php endif; ?>
 
                 <form method="POST">
                     <div class="form-group">
-                        <input type="email" name="email" placeholder="Admin Email" required>
+                        <input type="email" name="email" placeholder="Admin Email" value="admin@example.com" required>
                     </div>
                     
                     <div class="form-group">
@@ -210,18 +227,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     
                     <div class="form-group">
-                        <input type="text" name="code" placeholder="Admin Code" required>
+                        <input type="text" name="code" placeholder="Admin Code" value="ADMIN2024" required>
                     </div>
                     
                     <button type="submit" class="btn-submit">Login</button>
-                    
                 </form>
+
                 <div class="login-links">
-                    <a href="TB.php">Home</a>
+                    <a href="login.php">User Login</a>
+                    <a href="home.php">Back to Home</a>
                 </div>
             </div>
         </div>
     </section>
-<?php include("footer.php"); ?>
+    
+    <?php include("footer.php"); ?>
 </body>
 </html>
